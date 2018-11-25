@@ -1,0 +1,41 @@
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name">公司名称</label>
+    <div class="col-sm-8">
+        <input type="text" name="Carrier[name]" class="form-control"
+               value="{{ app.request.get('Carrier').name|default(entity.name) }}" id="input-name" >
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name">快递代码</label>
+    <div class="col-sm-8">
+        <input type="text" name="Carrier[code]" class="form-control"
+               value="{{ app.request.get('Carrier').code|default(entity.code) }}" id="input-code" >
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-phone">查询电话</label>
+    <div class="col-sm-8">
+        <input type="text" name="Carrier[phone]" class="form-control"
+               value="{{ app.request.get('Carrier').phone|default(entity.phone) }}" id="input-phone" >
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-status">状态</label>
+    <div class="col-sm-8">
+        {% autoescape false %}
+            {{ app.html.dropDownList('Carrier[status]',app.request.get('Carrier[status]')|default(entity.status),
+            {'10':'显示','90':'删除'},{'class':'form-control'}) }}
+        {% endautoescape %}
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+

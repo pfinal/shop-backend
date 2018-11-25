@@ -1,0 +1,137 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}系统配置{% endblock %}
+{% set leftMenuActive='Config' %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('static/jquery-file-upload/css/jquery.fileupload.css') }}">
+{% endblock %}
+
+{% block contentRight %}
+    <div class="page-title">系统配置</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+
+            <li>
+                <a href="{{ url('admin/config') }}">基础配置</a>
+            </li>
+
+            {% for key,item in typeList %}
+                <li class="{% if app.request.get('type') == key %}active{% endif %}">
+                    <a href="{{ url('admin/config/type',{'type': key}) }}">{{ item }}</a>
+                </li>
+            {% endfor %}
+
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 表单 #}
+                <form action="{{ url('admin/config/type') }}" method="post" class="form-horizontal mt15">
+
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                    <input type="hidden" name="type" value="{{ type }}">
+
+                    <div class="form-group">
+                        <div class="col-sm-4">
+
+                            <div class="form-group">
+                                <label class="col-sm-5 control-label">图片</label>
+
+                                <div class="col-sm-6">
+                                    <span class="btn btn-primary btn-sm fileinput-button" style="margin-top: 10px;">
+                                        <span>上传...</span>
+                                        <input class="fileupload" type="file" name="file">
+                                    </span>
+
+                                    <!-- 进度条 -->
+                                    <div class="progress progress-striped file-upload-progress active"
+                                         style="display: none;">
+                                        <div class="progress-bar progress-bar-info"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-5 col-sm-6">
+                                    <button type="submit" class="btn btn-primary">保存</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">效果</label>
+
+                                <div class="col-sm-8">
+                                    <input type="hidden" class="js-img-filekey" name="fileKey">
+
+                                    <div class="show-img">
+                                        <img class="js-img-show"
+                                             src="{{ entity.getFileUrl()|default(asset('images/no-pic.jpg')) }}"
+                                             width="300">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{{ asset('static/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}"></script>
+    <script src="{{ asset('static/jquery-file-upload/js/jquery.iframe-transport.js') }}"></script>
+    <script src="{{ asset('static/jquery-file-upload/js/jquery.fileupload.js') }}"></script>
+    <script>
+        $(function () {
+            'use strict';
+
+            $('.fileupload').fileupload({
+                url: '{{ url('admin/config/upload') }}',
+                dataType: 'json',
+                done: function (e, data) {
+
+                    $(".file-upload-progress").hide(); //隐藏进度条
+
+                    showImage(data.result.file)
+
+                },
+                progressall: function (e, data) {
+                    $('.file-upload-progress').show();
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('.file-upload-progress .progress-bar').css('width', progress + '%');
+                }
+            });
+
+            function showImage(file) {
+                var tempUrl = file.thumbnailUrl._temp; //预览临时图片
+
+                $('.js-img-show').attr('src', tempUrl);
+                $(".js-img-filekey").val(file.fileKey)
+            }
+
+        });
+    </script>
+{% endblock %}

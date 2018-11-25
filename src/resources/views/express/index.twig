@@ -1,0 +1,186 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}运费模板{% endblock %}
+{% set leftMenuActive='Express' %}
+
+{% block css %}
+    <link href="{{ asset('themes/css/express.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">运费模板</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/express/create') }}"><span
+                                class="glyphicon glyphicon-plus"></span> 新增运费模板</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/express') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Express[id]" class="form-control"
+                               value="{{ app.request.get('Express').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="Express[name]" class="form-control"
+                               value="{{ app.request.get('Express').name|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>发货时间</label>
+                        <input type="text" name="Express[consign]" class="form-control"
+                               value="{{ app.request.get('Express').consign|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Express') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/express') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 列表 #}
+                {% if dataProvider.data is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <div class="css-express-list-div">
+
+                            {% for item in dataProvider.data %}
+
+                                {% set wayCommon = item.wayCommon() %}
+                                {% set wayAppointList = item.wayAppointList() %}
+                                {% set freeList = item.freeList() %}
+
+                                <div class="css-express-list-item">
+
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                        <tr class="css-express-list-item-title-tr">
+                                            <td colspan="6">
+                                                <div class="css-express-list-item-title">
+                                                    <div class="css-express-list-item-name">
+                                                        {{ item.name }}
+                                                        {% if freeList|length > 0 %}(已指定条件包邮){% endif %}
+                                                        {% if item.isDefault() %}(内置){% endif %}
+                                                    </div>
+
+                                                    <div class="css-express-list-item-time">
+                                                        最后编辑时间：{{ item.updated_at }}
+                                                    </div>
+
+                                                    <div class="css-express-list-item-action">
+                                                        {% if item.isDefault() == false %}
+                                                            <a href="{{ url('admin/express/update',{'id': item.id}) }}"
+                                                               class="css-express-list-item-action-a">修改</a>
+                                                            {#<a href="{{ url('admin/express/delete', {'id':item.id, _token:csrf_token() }) }}"#}
+                                                            {#class="leaf-confirm" data-method="post"#}
+                                                            {#data-dialog-content="您确定要删除吗?">删除</a>#}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </thead>
+
+                                        <tdboy>
+                                            <tr>
+                                                <td>运送方式</td>
+                                                <td>运送到</td>
+                                                <td>首件(个)</td>
+                                                <td>运费(元)</td>
+                                                <td>续件(个)</td>
+                                                <td>运费(元)</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>{{ wayCommon.wayAlias() }}</td>
+                                                <td>{{ wayCommon.regionAlias() }}</td>
+                                                <td>{{ wayCommon.basic }}</td>
+                                                <td>{{ wayCommon.fee }}</td>
+                                                <td>{{ wayCommon.add_data }}</td>
+                                                <td>{{ wayCommon.add_fee }}</td>
+                                            </tr>
+
+                                            {% for wayItem in wayAppointList %}
+                                                <tr>
+                                                    <td>{{ wayItem.wayAlias() }}</td>
+                                                    <td>{{ wayItem.regionAlias() }}</td>
+                                                    <td>{{ wayItem.basic }}</td>
+                                                    <td>{{ wayItem.fee }}</td>
+                                                    <td>{{ wayItem.add_data }}</td>
+                                                    <td>{{ wayItem.add_fee }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tdboy>
+                                    </table>
+
+                                    {% if freeList|length > 0 %}
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                            <tr>
+                                                <td colspan="4">
+                                                    指定包邮
+                                                </td>
+                                            </tr>
+                                            </thead>
+
+                                            <tdboy>
+                                                <tr>
+                                                    <td>运送方式</td>
+                                                    <td>运送到</td>
+                                                    <td>包邮条件</td>
+                                                    <td>包邮数据</td>
+                                                </tr>
+
+                                                {% for freeItem in freeList %}
+                                                    <tr>
+                                                        <td>{{ freeItem.wayAlias() }}</td>
+                                                        <td>{{ freeItem.regionAlias() }}</td>
+                                                        <td>{{ freeItem.freeTypeAlias() }}</td>
+                                                        <td>{{ freeItem.money }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tdboy>
+                                        </table>
+                                    {% endif %}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ dataProvider.page.itemCount }} </strong>条记录 </span>
+                    {{ dataProvider.page.createLinks(url('admin/express')) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

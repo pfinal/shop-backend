@@ -1,0 +1,67 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}退货管理{% endblock %}
+{% set leftMenuActive='ReturnOrder' %}
+
+{% block stylesheet %}
+    <style>
+        .btn-ul li {
+            float: left;
+            margin-right: 10px;
+        }
+
+        .last-td {
+            border-right: 1px solid #DDDDDD;
+        }
+
+        table tr.active {
+            color: red;
+        }
+
+        .golden {
+            text-align: right;
+        }
+    </style>
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">退货管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">详情</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div style="margin: 10px 20px;">
+
+                <div class="mt15">
+                    <ul class="btn-ul">
+
+                        <a class="btn btn-default" href="javascript:window.history.go(-1);">返回</a>
+
+                        {% if entity.status == constant('Entity\\ReturnOrder::STATUS_APPLICATION') %}
+                            <li>
+                                <a class="btn btn-primary"
+                                   href="{{ url('admin/return-order/deal', {'id':entity.id}) }}">退货处理</a>
+                            </li>
+                        {% endif %}
+
+                        <div style="clear: both"></div>
+                    </ul>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 退货详情 #}
+                {% include '@AdminBundle/return-order/_view-content.twig' %}
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

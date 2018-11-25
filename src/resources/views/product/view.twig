@@ -1,0 +1,87 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="page-title">商品管理</div>
+
+                <div class="content-top">
+                    <ul class="top-nav">
+                        <li class="active"><a href="">查看商品</a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="mt15">
+                    <div class="pull-right">
+                        <a class="btn btn-primary btn-sm" href="{{ url('admin/product/update',{'id':entity.id}) }}"><span class="glyphicon glyphicon-edit"></span> 修改</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                <table class="table mt15">
+                    <tr>
+                        <td>Id</td>
+                        <td>{{ entity.id }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>分类</td>
+                        <td>{{ entity.category_id }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>品牌</td>
+                        <td>{{ entity.brand_id }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>名称</td>
+                        <td>{{ entity.name }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>参考价</td>
+                        <td>{{ entity.price }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>详细介绍</td>
+                        <td>{{ entity.content }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>状态</td>
+                        <td>{{ entity.status }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>排序</td>
+                        <td>{{ entity.sort }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>上架时间</td>
+                        <td>{{ entity.online_at }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>下架时间</td>
+                        <td>{{ entity.offline_at }}</td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

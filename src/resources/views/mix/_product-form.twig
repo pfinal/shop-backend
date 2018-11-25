@@ -1,0 +1,21 @@
+<input type="hidden" name="_token" value="{{ csrf_token()}}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">商品ID</label>
+    <div class="col-sm-8">
+        <input type="text" name="MixProduct[product_id]" class="form-control"
+               value="{{ app.request.get('MixProduct').product_id|default(entity.product_id) }}">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">排序</label>
+    <div class="col-sm-8">
+        <input type="text" name="MixProduct[sort]" class="form-control"
+               value="{{ app.request.get('MixProduct').sort|default(entity.sort) }}">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+

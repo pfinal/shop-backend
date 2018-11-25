@@ -1,0 +1,103 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}店铺装修{% endblock %}
+{% set leftMenuActive='Home' %}
+
+{% block contentRight %}
+
+    <div class="page-title">店铺装修-配置项</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">{{ tagString }}管理</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-info pull-left" href="{{ url('admin/home') }}">返回配置项</a>
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/home-item/create', {'tag': tag}) }}"><span class="glyphicon glyphicon-plus"></span> 新增</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/home-item') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="HomeItem[id]" class="form-control"
+                               value="{{ app.request.get('HomeItem').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>标识</label>
+                        <input type="text" name="HomeItem[tag]" class="form-control"
+                               value="{{ app.request.get('HomeItem').tag|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="HomeItem[name]" class="form-control"
+                               value="{{ app.request.get('HomeItem').name|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('HomeItem') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/home-item') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 列表 #}
+                {% if dataProvider.data is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>URL</th>
+                                    <th>图片</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in dataProvider.data %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.url }}</td>
+                                    <td>
+                                        <img src="{{ item.getPicUrl()|default(asset('images/no-pic.jpg')) }}" width="120">
+                                    </td>
+                                    <td>
+                                        <a href="{{ url('admin/home-item/update', {'id':item.id, 'tag': tag}) }}">修改</a>
+                                        <a href="{{ url('admin/home-item/delete', {'id':item.id, _token:csrf_token(), 'tag': tag }) }}" class="leaf-confirm" data-method="post" data-dialog-content="您确定要删除吗?">删除</a>
+                                    </td>
+                                </tr>
+                        {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ dataProvider.page.itemCount }} </strong>条记录 </span>
+                    {{ dataProvider.page.createLinks(url('admin/home-item')) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

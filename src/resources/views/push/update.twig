@@ -1,0 +1,44 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}推送管理{% endblock %}
+{% set leftMenuActive='Push' %}
+
+{% block contentRight %}
+
+    <div class="page-title">推送管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">修改推送</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                <div class="ui-tips bg-info">
+                    <span class="icon glyphicon glyphicon-info-sign"></span>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form class="form-horizontal mt15" action="{{ url('admin/push/update',{'id': entity.id}) }}" method="post">
+
+                    {{ include('@AdminBundle/push/_form.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="mt15"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}退货管理{% endblock %}
+{% set leftMenuActive='ReturnOrder' %}
+
+{% block css %}
+    <style>
+
+        .css-hide-div {
+            display: none;
+        }
+
+        .last-td {
+            border-right: 1px solid #DDDDDD;
+        }
+
+        table tr.active {
+            color: red;
+        }
+
+        .golden {
+            text-align: right;
+        }
+
+    </style>
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">退货管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">退货处理</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <ul class="btn-ul">
+
+                        <a class="btn btn-default" href="javascript:window.history.go(-1);">返回</a>
+
+                    </ul>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="mt15"></div>
+
+                {# 表单 #}
+                <form action="{{ url('admin/return-order/deal') }}" method="post" class="form-horizontal mt15">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="id" value="{{ entity.id }}">
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">审核意见</label>
+                        <div class="col-sm-8">
+
+                            {% autoescape false %}
+                                {{ app.html.radioButtonList('ReturnOrder[status]', app.request.get('ReturnOrder').status|default(constant('Entity\\ReturnOrder::STATUS_REFUSE')) , statusList,{'labelOptions':{'class':'radio-inline js-status-select'}} ) }}
+                            {% endautoescape %}
+
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group css-hide-div js-refuse-div">
+                        <label class="col-sm-2 control-label">拒绝原因</label>
+                        <div class="col-sm-8">
+
+                            <textarea name="ReturnOrder[reply]"
+                                      class="form-control"
+                                      rows="3">{{ app.request.get('ReturnOrder').reply|default('') }}</textarea>
+
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group css-hide-div js-agree-div">
+                        <label class="col-sm-2 control-label">退回商品</label>
+                        <div class="col-sm-8">
+                            {% autoescape false %}
+                                {{ app.html.radioButtonList('ReturnOrder[delivery_status]', app.request.get('ReturnOrder').delivery_status|default(constant('Entity\\ReturnOrder::DELIVERY_STATUS_NO')) , deliveryCheckList,{'labelOptions':{'class':'radio-inline js-delivery-select'}} ) }}
+                            {% endautoescape %}
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group css-hide-div js-agree-div">
+                        <label class="col-sm-2 control-label">退款操作</label>
+                        <div class="col-sm-8">
+                            {% autoescape false %}
+                                {{ app.html.radioButtonList('ReturnOrder[refund_status]', app.request.get('ReturnOrder').refund_status|default(constant('Entity\\ReturnOrder::REFUND_STATUS_NO')) , refundStatusList,{'labelOptions':{'class':'radio-inline js-refund-status-select'}} ) }}
+                            {% endautoescape %}
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group css-hide-div js-refund-fee-div">
+                        <label class="col-sm-2 control-label">退款金额</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="ReturnOrder[refund_fee]" class="form-control"
+                                   value="{{ app.request.get('ReturnOrder').refund_fee|default('0') }}">
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary js-submit">保存</button>
+                        </div>
+                    </div>
+
+                </form>
+
+                {# 退货详情 #}
+                {% include '@AdminBundle/return-order/_view-content.twig' %}
+
+                <div class="mt15"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            // 根据处理结果，决定显示哪些输入框
+            showByStatus();
+
+            showByRefundStatus()
+        });
+
+        $(".js-status-select input").change(function () {
+            showByStatus()
+        })
+
+        // 根据处理结果，决定显示哪些输入框
+        function showByStatus() {
+            var status = $(".js-status-select input:checked").val()
+
+            if (status == {{ constant('Entity\\ReturnOrder::STATUS_REFUSE') }}) {
+                $(".js-agree-div").css('display', 'none')
+                $(".js-refuse-div").css('display', 'block')
+            } else if (status == {{ constant('Entity\\ReturnOrder::STATUS_AGREE') }}) {
+                $(".js-agree-div").css('display', 'block')
+                $(".js-refuse-div").css('display', 'none')
+
+                showByRefundStatus()
+            } else {
+                leaf.alert("处理结果有误")
+            }
+        }
+
+        $(".js-refund-status-select input").change(function () {
+            showByRefundStatus()
+        })
+
+        // 根据退款结果，决定显示哪些输入框
+        function showByRefundStatus() {
+            // 判断是否有展示
+            if ($(".js-agree-div").css('display') != 'block') {
+                $(".js-refund-fee-div").css('display', 'none')
+                return;
+            }
+
+            var status = $(".js-refund-status-select input:checked").val()
+
+            if (status == {{ constant('Entity\\ReturnOrder::REFUND_STATUS_NO') }}) {
+                $(".js-refund-fee-div").css('display', 'none')
+            } else {
+                $(".js-refund-fee-div").css('display', 'block')
+            }
+        }
+
+    </script>
+{% endblock %}

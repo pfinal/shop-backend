@@ -1,0 +1,50 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品分组{% endblock %}
+{% set leftMenuActive='Mix' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品分组</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">{{ mix.name }}:编辑分组商品</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form action="{{ url('admin/mix/product-update') }}" method="post" class="form-horizontal mt15">
+
+                    <input type="hidden" name="id" value="{{ entity.id }}">
+
+                    {{ include('@AdminBundle/mix/_product-form.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {% include '@AdminBundle/mix/_product-js.twig' %}
+{% endblock %}

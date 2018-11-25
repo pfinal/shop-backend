@@ -1,0 +1,102 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}物流公司管理{% endblock %}
+{% set leftMenuActive='Carrier' %}
+
+{% block contentRight %}
+    <div class="page-title">物流公司管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">物流公司列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/carrier/create') }}"><span class="glyphicon glyphicon-plus"></span> 新增物流公司</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/carrier') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Carrier[id]" class="form-control"
+                               value="{{ app.request.get('Carrier').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>公司名称</label>
+                        <input type="text" name="Carrier[name]" class="form-control"
+                               value="{{ app.request.get('Carrier').name|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>查询电话</label>
+                        <input type="text" name="Carrier[phone]" class="form-control"
+                               value="{{ app.request.get('Carrier').phone|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Carrier') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/carrier') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mt15">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>公司名称</th>
+                                    <th>查询电话</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.phone }}</td>
+                                    <td>{{ item.getStatus }}</td>
+                                    <td>
+                                        {#<a href="{{ url('admin/carrier/view', {'id':item.id}) }}">详情</a>#}
+                                        <a href="{{ url('admin/carrier/update', {'id':item.id}) }}">修改</a>
+                                        <a href="{{ url('admin/carrier/delete', {'id':item.id}) }}" class="leaf-confirm">删除</a>
+                                    </td>
+                                </tr>
+                        {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/carrier'))|raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

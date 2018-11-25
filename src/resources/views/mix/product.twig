@@ -1,0 +1,102 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品分组{% endblock %}
+{% set leftMenuActive='Mix' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品分组</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">{{ mix.name }}:商品管理</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/mix/product-create',{'mix_id':mix.id}) }}"><span
+                                class="glyphicon glyphicon-plus"></span> 新增</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/mix') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Mix[id]" class="form-control"
+                               value="{{ app.request.get('Mix').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="Mix[name]" class="form-control"
+                               value="{{ app.request.get('Mix').name|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ICON</label>
+                        <input type="text" name="Mix[icon]" class="form-control"
+                               value="{{ app.request.get('Mix').icon|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Mix') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/mix') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>分组</th>
+                                <th>商品</th>
+                                <th>排序</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                    <td>{{ mix.name }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.psort }}</td>
+                                    <td>
+                                        <a href="{{ url('admin/mix/product-update', {'id':item.mp_id}) }}">修改</a>
+                                        <a href="{{ url('admin/mix/product-delete', {'id':item.mp_id, _token:csrf_token() }) }}"
+                                           class="leaf-confirm" data-method="post" data-dialog-content="您确定要删除吗?">删除</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/mix/product',{'mix_id':mix.id})) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

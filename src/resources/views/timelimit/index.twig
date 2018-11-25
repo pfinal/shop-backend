@@ -1,0 +1,103 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}限时秒杀管理{% endblock %}
+{% set leftMenuActive='Timelimit' %}
+
+{% block contentRight %}
+
+    <div class="page-title">限时秒杀管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">限时秒杀列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    {#<a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/timelimit/create') }}"><span class="glyphicon glyphicon-plus"></span> 新增限时秒杀</a>#}
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/timelimit') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Timelimit[id]" class="form-control"
+                               value="{{ app.request.get('Timelimit').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>产品</label>
+                        <input type="text" name="Timelimit[product_id]" class="form-control"
+                               value="{{ app.request.get('Timelimit').product_id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>开始时刻</label>
+                        <input type="text" name="Timelimit[begin]" class="form-control"
+                               value="{{ app.request.get('Timelimit').begin|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Timelimit') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/timelimit') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 列表 #}
+                {% if dataProvider.data is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>产品</th>
+                                    <th>开始时刻</th>
+                                    <th>持续秒数</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in dataProvider.data %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.product_id }}</td>
+                                    <td>{{ item.begin }}</td>
+                                    <td>{{ item.duration_second }}</td>
+                                    <td>
+                                        {#<a href="{{ url('admin/timelimit/view', {'id':item.id}) }}">详情</a>#}
+                                        <a href="{{ url('admin/timelimit/update', {'productId':item.product_id}) }}">修改</a>
+                                        <a href="{{ url('admin/timelimit/delete', {'id':item.id, _token:csrf_token() }) }}" class="leaf-confirm" data-method="post" data-dialog-content="您确定要删除吗?">删除</a>
+                                    </td>
+                                </tr>
+                        {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ dataProvider.page.itemCount }} </strong>条记录 </span>
+                    {{ dataProvider.page.createLinks(url('admin/timelimit')) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

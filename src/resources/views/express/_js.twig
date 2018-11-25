@@ -1,0 +1,418 @@
+<script src="{{ asset('static/art-template/template-native.js') }}"></script>
+
+<!-- 为指定地区城市设置运费 -->
+<script id="tpl-appoint-way" type="text/html">
+    <tr data-index="<%= index %>">
+        <td>
+            <div class="css-appoint-way-region-div js-region-all-div-item" data-index="<%= index %>">
+                <div class="region-data js-region-selected-data-div">
+                    <div class="js-region-selected-data">未添加地区</div>
+
+                    <input type="hidden"
+                           name="ExpressWayAppoint[<%= index %>][region_codes]">
+                </div>
+
+                <a href="javascript:;" class="region-action js-region-add-a js-check-submit-item">编辑</a>
+            </div>
+
+        </td>
+        <td><input type="text" class="input js-check-submit-item"
+                   name="ExpressWayAppoint[<%= index %>][basic]" value="">
+        </td>
+        <td><input type="text" class="input js-check-submit-item"
+                   name="ExpressWayAppoint[<%= index %>][fee]" value="">
+        </td>
+        <td><input type="text" class="input js-check-submit-item"
+                   name="ExpressWayAppoint[<%= index %>][add_data]"
+                   value=""></td>
+        <td><input type="text" class="input js-check-submit-item"
+                   name="ExpressWayAppoint[<%= index %>][add_fee]"
+                   value=""></td>
+        <td><a href="javascript:;" class="js-region-delete js-check-submit-item">删除</a></td>
+    </tr>
+</script>
+
+<!-- 指定条件包邮 -->
+<script id="tpl-express-free-way" type="text/html">
+    <tr data-index="<%= index %>">
+        <td>
+            <div class="css-appoint-way-region-div js-region-all-div-item" data-index="<%= index %>">
+                <div class="region-data js-region-selected-data-div">
+                    <div class="js-region-selected-data">未添加地区</div>
+
+                    <input type="hidden" name="ExpressFree[<%= index %>][region_codes]">
+                </div>
+
+                <a href="javascript:;" class="region-action js-region-add-a js-check-submit-item">编辑</a>
+            </div>
+
+        </td>
+        <td>快递</td>
+        <td>金额</td>
+        <td>满&nbsp;<input type="text" class="input js-check-submit-item" name="ExpressFree[<%= index %>][money]"
+                          value="">&nbsp;元包邮
+        </td>
+        <td><a href="javascript:;" class="js-express-free-way-region-delete js-check-submit-item">删除</a></td>
+    </tr>
+</script>
+
+<script>
+    $(function () {
+        $(".js-disabled-check input").attr('disabled', 'disabled');
+
+        checkSubmitBtn();
+    })
+
+    // 为指定地区城市设置运费
+    $(".js-add-appoint-way").click(function () {
+        var trs = $(".js-appoint-way tbody").find('tr');
+
+        var index = 0;
+
+        for(var i = 0 ; i < trs.length; i++) {
+            var tempIndex = $(trs[i]).attr('data-index');
+            if(parseInt(index) < parseInt(tempIndex)) {
+                index = tempIndex
+            }
+        }
+
+        index = parseInt(index) + 1;
+
+        var html = template('tpl-appoint-way', {
+            'index': index
+        });
+
+        $(".js-appoint-way-show-div").append(html);
+
+        $(".js-appoint-way").css('display', 'block');
+    });
+
+    // 和地区有关的表格删除
+    $(document).on('click', '.js-region-delete', function () {
+        $(this).parents('tr').remove();
+
+        // 检测是否还有内容，没有的话，则隐藏表格
+        var trs = $(".js-appoint-way tbody").find('tr');
+
+        if (trs.length <= 0) {
+            $(".js-appoint-way").css('display', 'none');
+        }
+    });
+
+    // 指定条件包邮
+    $(".js-express-free-way-add").click(function () {
+        var trs = $(".js-express-free-way-div tbody").find('tr');
+
+        var index = 0;
+
+        for(var i = 0 ; i < trs.length; i++) {
+            var tempIndex = $(trs[i]).attr('data-index');
+            if(parseInt(index) < parseInt(tempIndex)) {
+                index = tempIndex
+            }
+        }
+
+        index = parseInt(index) + 1;
+
+        var html = template('tpl-express-free-way', {
+            'index': index
+        });
+
+        $(".js-express-free-way-tbody").append(html);
+
+        $(".js-express-free-way-div").css('display', 'block');
+    });
+
+    // 和地区有关的表格删除
+    $(document).on('click', '.js-express-free-way-region-delete', function () {
+        $(this).parents('tr').remove();
+
+        // 检测是否还有内容，没有的话，则隐藏表格
+        var trs = $(".js-express-free-way-div tbody").find('tr');
+
+        if (trs.length <= 0) {
+            $(".js-express-free-way-div").css('display', 'none');
+        }
+    });
+
+    // 选择地区
+    $(document).on('click', '.js-region-add-a', function () {
+        var regionAllDiv = $(this).parents('.js-region-all-div-item');
+
+        if ((!regionAllDiv) || (regionAllDiv.length <= 0)) {
+            leaf.alert('数据有误');
+            return false;
+        }
+
+        clearRegion();
+
+        // 默认选中
+        var input = $(regionAllDiv).find('input')
+        input = input[0]
+        var regionIds = $.trim($(input).val());
+
+        handleRegionSelect(regionIds);
+
+        // 处理其他被选择过的地区
+        handleRegionDisable(regionAllDiv)
+
+        window.regionShow = leaf.show('.js-express-region-show-div');
+        window.regionAllDiv = regionAllDiv;
+    })
+
+    // 选择区域
+    $(document).on('click', '.js-region-submit', function () {
+        var regionIds = []
+        var regionNames = []
+
+        var inputList = $(".js-region-checkbox input:checked");
+
+        for (var i = 0; i < inputList.length; i++) {
+            // 排除被禁用的
+            if ($(inputList[i]).attr('disabled') == 'disabled') {
+                continue;
+            }
+
+            regionIds.push(parseInt($(inputList[i]).val()))
+        }
+
+        {% for key,item in regionList %}
+        if (jQuery.inArray(parseInt({{ key }}), regionIds) !== -1) {
+            regionNames.push('{{ item }}')
+        }
+        {% endfor %}
+
+        // 将数据放入对应的展示中
+        var regionAllDiv = window.regionAllDiv
+        window.regionAllDiv = ''
+
+        if (regionNames.length <= 0) {
+            regionNames = '未添加地区'
+            regionIds = ''
+        } else {
+            regionNames = regionNames.join(',')
+            regionIds = regionIds.join(',')
+        }
+
+        $(regionAllDiv).find('.js-region-selected-data').html(regionNames)
+        $(regionAllDiv).find('input').val(regionIds)
+
+        // 关闭弹框
+        window.regionShow.close()
+
+        checkSubmitBtn();
+    })
+
+    // 清空区域的选择、禁用等限制
+    function clearRegion() {
+        var inputList = $(".js-region-checkbox").find('input')
+
+        for (var i = 0; i < inputList.length; i++) {
+            $(inputList[i]).removeAttr('checked');
+            $(inputList[i]).removeAttr('disabled');
+        }
+    }
+
+    // 处理默认选中项
+    function handleRegionSelect(regionIds) {
+
+        if (!regionIds) {
+            return;
+        }
+
+        regionIds = regionIds.toString().split(',')
+
+        if (regionIds.length <= 0) {
+            return;
+        }
+
+        for (var j = 0; j < regionIds.length; j++) {
+            regionIds[j] = parseInt(regionIds[j])
+        }
+
+        var inputList = $(".js-region-checkbox").find('input')
+
+        for (var i = 0; i < inputList.length; i++) {
+            var input = $(inputList[i]);
+
+            var id = $(input).val()
+
+            if (jQuery.inArray(parseInt(id), regionIds) === -1) {
+                continue;
+            }
+
+            $(input).prop('checked', true);
+        }
+
+    }
+
+    // 处理禁用项
+    function handleRegionDisable(regionAllDiv) {
+
+        if (!regionAllDiv) {
+            return;
+        }
+
+        var nowIndex = $(regionAllDiv).attr('data-index');
+
+        var itemList = $(regionAllDiv).parents('table').find('.js-region-all-div-item');
+
+        var regionIds = []
+
+        for (var j = 0; j < itemList.length; j++) {
+            // 跳过自己
+            var tempIndex = $(itemList[j]).attr('data-index')
+
+            if (parseInt(tempIndex) == parseInt(nowIndex)) {
+                continue;
+            }
+
+            var input = $(itemList[j]).find('input')
+
+            input = input[0]
+
+            var tempRegionIds = $.trim($(input).val())
+
+            if (!tempRegionIds) {
+                continue;
+            }
+
+            tempRegionIds = tempRegionIds.toString().split(',')
+
+            if (tempRegionIds.length <= 0) {
+                continue;
+            }
+
+            for (var k = 0; k < tempRegionIds.length; k++) {
+                regionIds.push(tempRegionIds[k])
+            }
+        }
+
+        if (regionIds.length <= 0) {
+            return;
+        }
+
+        for (var j = 0; j < regionIds.length; j++) {
+            regionIds[j] = parseInt(regionIds[j])
+        }
+
+        var inputList = $(".js-region-checkbox").find('input')
+
+        for (var i = 0; i < inputList.length; i++) {
+            var input = $(inputList[i]);
+
+            var id = $(input).val()
+
+            if (jQuery.inArray(parseInt(id), regionIds) === -1) {
+                continue;
+            }
+
+            $(input).prop('checked', true);
+            $(input).attr('disabled', 'disabled');
+        }
+
+    }
+
+    $(document).on('keyup', '.js-check-submit-item', function () {
+        checkSubmitBtn();
+    })
+
+    $(document).on('click', '.js-check-submit-item', function () {
+        checkSubmitBtn();
+    })
+
+    // 提交
+    $(".js-submit").click(function () {
+        var resultData = checkForSubmit()
+
+        if (!resultData['result']) {
+            leaf.toast(resultData['error'])
+            return;
+        }
+
+        $(".my-form").submit();
+    });
+
+    // 检测提交的按钮
+    function checkSubmitBtn() {
+
+        var resultData = checkForSubmit()
+
+        if (resultData['result']) {
+            $(".js-submit").removeAttr('disabled');
+            $(".js-submit").removeClass('btn-disabled');
+        } else {
+            $(".js-submit").attr('disabled', 'disabled');
+            $(".js-submit").addClass('btn-disabled');
+        }
+
+    }
+
+    // 检测提交的按钮
+    function checkForSubmit() {
+        // 查找带有Express[的input
+        var expressInput = $("input[name^='Express[']");
+        var expressWayCommonInput = $("input[name^='ExpressWayCommon[']");
+        var expressWayAppointInput = $("input[name^='ExpressWayAppoint[']");
+        var expressFreeInput = $("input[name^='ExpressFree[']");
+
+        var i = 0;
+        var temp = '';
+
+        for (i = 0; i < expressInput.length; i++) {
+            temp = $.trim($(expressInput[i]).val())
+
+            if (!temp) {
+                return {
+                    'result': false,
+                    'error': '请完整填写模板内容'
+                };
+            }
+        }
+
+        for (i = 0; i < expressWayCommonInput.length; i++) {
+            temp = $.trim($(expressWayCommonInput[i]).val())
+
+            if (!temp) {
+                return {
+                    'result': false,
+                    'error': '请完整填写运送方式内容'
+                };
+            }
+        }
+
+        if (expressWayAppointInput) {
+            for (i = 0; i < expressWayAppointInput.length; i++) {
+                temp = $.trim($(expressWayAppointInput[i]).val())
+
+                if (!temp) {
+                    return {
+                        'result': false,
+                        'error': '请完整填写指定地区城市运费内容'
+                    };
+                }
+            }
+        }
+
+        if (expressFreeInput) {
+            for (i = 0; i < expressFreeInput.length; i++) {
+                temp = $.trim($(expressFreeInput[i]).val())
+
+                if (!temp) {
+                    return {
+                        'result': false,
+                        'error': '请完整填写包邮内容'
+                    };
+                }
+            }
+        }
+
+        return {
+            'result': true,
+            'error': ''
+        };
+
+    }
+
+
+</script>

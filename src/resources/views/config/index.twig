@@ -1,0 +1,75 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}系统配置{% endblock %}
+{% set leftMenuActive='Config' %}
+
+{% block css %}
+{% endblock %}
+
+{% block contentRight %}
+    <div class="page-title">系统配置</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+
+            <li class="active">
+                <a href="{{ url('admin/config') }}">基础配置</a>
+            </li>
+
+            {% for key,item in typeList %}
+                <li>
+                    <a href="{{ url('admin/config/type',{'type': key}) }}">{{ item }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 表单 #}
+                <form action="{{ url('admin/config') }}" method="post" class="form-horizontal mt15">
+
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                    {% for item in list %}
+                        {% set entity = item.entity %}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">{{ item.type_info.name }}</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="Config[{{ entity.type }}]" class="form-control"
+                                       value="{{ entity.content }}">
+                                <span class="help-block">{# 帮助信息 #}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}

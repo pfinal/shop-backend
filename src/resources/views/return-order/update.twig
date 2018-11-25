@@ -1,0 +1,131 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}退货管理{% endblock %}
+{% set leftMenuActive='ReturnOrder' %}
+
+{% block contentRight %}
+
+    <div class="page-title">退货管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">退货处理</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                <table class="table mt15">
+                    <tr>
+                        <td>订单号</td>
+                        <td>{{ entity.getOrderNumber }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>商品名称</td>
+                        <td>{{ entity.getProductName }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>下单人</td>
+                        <td>{{ entity.nickname }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>联系人</td>
+                        <td>{{ entity.contact }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>联系电话</td>
+                        <td>{{ entity.mobile }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>退货原因</td>
+                        <td>{{ entity.message }}</td>
+                    </tr>
+
+                    {% if entity.status == 10 %}
+                        <tr>
+                            <td>选择状态</td>
+                            <td>
+                                <a href="javascript:;" data-status="40" class="btn btn-default js-save">拒绝退货</a>
+                                <a href="javascript:;" data-status="30" class="btn btn-primary js-save">同意退货</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% if entity.status == 40 %}
+                        <tr>
+                            <td>退货状态</td>
+                            <td>{{ entity.getStatus }}</td>
+                        </tr>
+                    {% endif %}
+
+                    {% if entity.status == 30 %}
+                        <tr>
+                            <td>选择状态</td>
+                            <td>
+                                <a href="javascript:;" data-status="50" class="btn btn-primary js-save">退货完成</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% if entity.status == 50 %}
+                        <tr>
+                            <td>退货状态</td>
+                            <td>{{ entity.getStatus }}</td>
+                        </tr>
+                    {% endif %}
+                </table>
+
+                <div class="mt15"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            $(".js-save").click(function () {
+                var status = $(this).attr("data-status");
+
+                leaf.confirm('您确定执行此操作吗？', function () {
+                    if (title = '确认') {
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ url('admin/return-order/update?id='~entity.id) }}",
+                            data: {"status": status},
+                            dataType: "json",
+                            success: function (result) {
+                                if (result.status) {
+                                    leaf.toast(result.data, 1000, function () {
+                                        window.location = "{{ url('admin/return-order/update?id='~entity.id) }}";
+                                    });
+                                } else {
+                                    leaf.toast(result.data);
+                                }
+
+                            },
+                            error: function (xmlHttpRequest, textStatus, errorThrown) {
+                                leaf.toast('网络错误');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

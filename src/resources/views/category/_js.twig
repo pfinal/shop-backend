@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="{{ asset('static/jquery-file-upload/css/jquery.fileupload.css') }}">
+
+<script src="{{ asset('static/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}"></script>
+<script src="{{ asset('static/jquery-file-upload/js/jquery.iframe-transport.js') }}"></script>
+<script src="{{ asset('static/jquery-file-upload/js/jquery.fileupload.js') }}"></script>
+<script>
+    $(function () {
+        'use strict';
+
+        var url = '{{ url('admin/category/upload') }}';
+
+        $('.fileupload').fileupload({
+            url: url,
+            dataType: 'json',
+            done: function (e, data) {
+
+                $(".file-upload-progress").hide(); //隐藏进度条
+
+                var file = data.result.file;
+
+                //e.target 当前点击的按扭
+                var showDiv = $(e.target).attr("data-show");
+
+                $(".js-cover-file-key").val(file.fileKey)
+                $(".js-cover-img").attr('src', file.thumbnailUrl._temp)
+
+            },
+            progressall: function (e, data) {
+                $('.file-upload-progress').show();
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('.file-upload-progress .progress-bar').css('width', progress + '%');
+            }
+        });
+
+    });
+</script>

@@ -1,0 +1,146 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+    <div class="page-title">商品管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="{{ url('admin/product') }}">商品列表</a></li>
+            <li class=""><a href="{{ url('admin/category') }}">分类管理</a></li>
+            <li class=""><a href="{{ url('admin/brand') }}">品牌管理</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/product/create') }}"><span
+                                class="glyphicon glyphicon-plus"></span> 新增商品</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                <form action="{{ url('admin/product') }}" method="get" class="form-inline form-search mt15">
+                    {#<div class="form-group">#}
+                        {#<label>Id</label>#}
+                        {#<input type="text" name="Search[id]" class="form-control"#}
+                               {#value="{{ app.request.get('Search').id|default('') }}">#}
+                    {#</div>#}
+
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="Search[name]" class="form-control"
+                               value="{{ app.request.get('Search').name|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>分类</label>
+
+                        {% autoescape false %}
+                            {{ app.html.dropDownList('Search[category_id]', app.request.get('Search').category_id|default('') , categoryList,{'class':'form-control','prompt': '所有'}) }}
+                        {% endautoescape %}
+                    </div>
+
+                    <div class="form-group">
+                        <label>品牌</label>
+
+                        {% autoescape false %}
+                            {{ app.html.dropDownList('Search[brand_id]', app.request.get('Search').brand_id|default('') , brandList,{'class':'form-control','prompt': '所有'}) }}
+                        {% endautoescape %}
+                    </div>
+
+                    {#<div class="form-group">#}
+                        {#<label>运费模板</label>#}
+
+                        {#{% autoescape false %}#}
+                            {#{{ app.html.dropDownList('Search[express_id]', app.request.get('Search').express_id|default('') , expressList,{'class':'form-control','prompt': '所有'}) }}#}
+                        {#{% endautoescape %}#}
+                    {#</div>#}
+
+                    <div class="form-group">
+                        <label>状态</label>
+
+                        {% autoescape false %}
+                            {{ app.html.dropDownList('Search[status]', app.request.get('Search').status|default('') ,statusList,{'class':'form-control','prompt': '所有'}) }}
+                        {% endautoescape %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Search') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/product') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mt15">
+                            <thead>
+                            <tr>
+                                {# <th>ID</th>#}
+                                <th width="350">名称</th>
+                                <th>库存</th>
+                                <th>分类</th>
+                                <th>品牌</th>
+                                {#<th>排序</th>#}
+                                <th>单价</th>
+                                {#<th>基础销量</th>#}
+                                <th>销量</th>
+                                <th>运费模板</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                    {#  <td>{{ item.id }}</td>#}
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.stockQuantity }}</td>
+                                    <td>{{ item.getCategoryName }}</td>
+                                    <td>{{ item.getBrandName }}</td>
+                                    {#<td>{{ item.sort }}</td>#}
+                                    <td>{{ item.price }}</td>
+                                    {#<td>{{ item.basic_sale_num }}</td>#}
+                                    <td>{{ item.sale_num }}</td>
+                                    <td>{{ item.userExpress().name }}</td>
+                                    <td>{{ item.getStatusName }}</td>
+                                    <td>
+                                        {#<a href="{{ url('admin/product/view', {'id':item.id}) }}">详情</a>#}
+                                        <a href="{{ url('admin/product/update', {'id':item.id}) }}">修改</a>
+                                        <a href="{{ url('admin/product/delete', {'id':item.id}) }}"
+                                           class="leaf-confirm">删除</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/product'))|raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

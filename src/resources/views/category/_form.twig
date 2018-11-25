@@ -1,0 +1,114 @@
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name">名称</label>
+    <div class="col-sm-8">
+        <input type="text" name="Category[name]" class="form-control"
+               value="{{ app.request.get('Category').name|default(entity.name) }}" id="input-name">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+<div class="form-group
+                {% if entity.childCreate is not defined %}
+                    {% if app.request.get('Category').parent_id is defined %}
+                         {% if app.request.get('Category').parent_id==0 %}
+                             hidden
+                         {% endif %}
+                    {% else %}hidden{% endif %}
+                {% endif %}">
+
+    <label class="col-sm-2 control-label" for="input-parent_id">父级</label>
+    <div class="col-sm-8">
+        <span class="form-control">{{ category.getNameByValue(app.request.get('Category').parent_id|default(entity.parent_id)) }}</span>
+        <input type="text" name="Category[parent_id]" class=" hidden"
+               value="{{ app.request.get('Category').parent_id|default(entity.parent_id) }}"
+               id="input-parent_id">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group hidden">
+    <label class="col-sm-2 control-label" for="input-path">Path</label>
+    <div class="col-sm-8">
+        <input type="text" name="Category[path]" class="form-control"
+               value="{{ app.request.get('Category').path|default(entity.path) }}" id="input-path">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-status">状态</label>
+    <div class="col-sm-8">
+        {% autoescape false %}
+            {{ app.html.dropDownList('Category[status]',entity.status|default(10),status,{'class':'form-control'}) }}
+        {% endautoescape %}
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-sort">排序</label>
+    <div class="col-sm-8">
+        <input type="text" name="Category[sort]" class="form-control"
+               value="{{ app.request.get('Category').sort|default(entity.sort) }}" id="input-sort">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-property">属性 </label>
+    <div class="col-sm-8">
+        {#{{ app.request.get('Category').property|default(entity.property) }}#}
+        {% for key,value in property %}
+            {% if entity.childCreate is not defined %}
+                <input type="checkbox" value="{{ key }}" data-id="123" name="Category[property][]"
+                       {% if entity.isChecked( key ) %}checked
+                       {% elseif category is defined and category.isChecked( key ) %}checked{% endif %}
+                       class="{% if updateTwig is not defined or entity.isChecked( key ) %}{% else %}hidden{% endif %}"
+                        {% if updateTwig is defined and updateTwig=='update' %}disabled{% endif %}
+                >
+                <span class="{% if updateTwig is not defined or entity.isChecked( key ) %}{% else %}hidden{% endif %}">{{ value }}</span>
+            {% else %}
+                <input type="checkbox" value="{{ key }}" name="Category[property][]"
+                       {% if entity.isChecked( key ) %}checked
+                       {% elseif category is defined and category.isChecked( key ) %}checked{% endif %}
+                       class="{% if  entity.isChecked( key ) %}{% else %}hidden{% endif %}"
+                        {% if entity.childCreate is  defined %}disabled{% endif %}
+                >
+                <span class="{% if entity.isChecked( key ) %}{% else %}hidden{% endif %}">{{ value }}</span>
+            {% endif %}
+        {% endfor %}
+        {% if entity.property is empty and (updateTwig is defined and  updateTwig=='update' or entity.childCreate is defined) %}------{% endif %}
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+{#  文件上传  #}
+<div class="form-group">
+
+    <label for="" class="col-sm-2 control-label">主图</label>
+
+    <div class="col-sm-8">
+        <input type="hidden" name="fileKey" class="js-cover-file-key">
+
+        <div class="show-cover">
+            <img class="js-cover-img"
+                 src="{{ entity.getCoverUrl()|default(asset('images/no-pic.jpg')) }}" width="120">
+        </div>
+
+        <span class="btn btn-primary btn-sm fileinput-button" style="margin-top: 10px;">
+            <span>上传...</span>
+            <input class="fileupload" type="file" name="file">
+        </span>
+
+        <!-- 进度条 -->
+        <div class="progress progress-striped active file-upload-progress"
+             style="display: none;">
+            <div class="progress-bar progress-bar-info"></div>
+        </div>
+    </div>
+
+</div>
+

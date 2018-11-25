@@ -1,0 +1,133 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}订单管理{% endblock %}
+{% set leftMenuActive='Order' %}
+
+{% block contentRight %}
+    <div class="page-title">订单管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+
+            {% for key,name in tabList %}
+                <li class="{% if tab == key %}active{% endif %}">
+                    <a href="{{ url('admin/order',{'tab': key}) }}">{{ name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                {#<div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/order/create') }}"><span class="glyphicon glyphicon-plus"></span> 新增订单</a>
+                    <div class="clearfix"></div>
+                </div>#}
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                <form action="{{ url('admin/order') }}" method="get" class="form-inline form-search mt15">
+                    <input type="hidden" name="tab" value="{{ tab }}">
+                    {#<div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Order[id]" class="form-control"
+                               value="{{ app.request.get('Order').id|default('') }}">
+                    </div>#}
+
+                    <div class="form-group">
+                        <label>订单号</label>
+                        <input type="text" name="Order[number]" class="form-control"
+                               value="{{ app.request.get('Order').number|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>收货人</label>
+                        <input type="text" name="Order[receiver_name]" class="form-control"
+                               value="{{ app.request.get('Order').receiver_name|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>收货手机</label>
+                        <input type="text" name="Order[receiver_mobile]" class="form-control"
+                               value="{{ app.request.get('Order').receiver_mobile|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Order') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/order',{'tab':tab}) }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div>
+                        <table class="table table-hover mt15">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>订单号</th>
+                                <th>商品总额</th>
+                                <th>城市</th>
+                                <th>收货姓名</th>
+                                <th>收货电话</th>
+                                <th>支付方式</th>
+                                <th>状态</th>
+                                <th>下单时间</th>
+                                <th>操作</th>
+                                {#<th>打印</th>#}
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                    <td>{#<input type="checkbox" value="{{ item.id }}">#}</td>
+                                    <td>{{ item.number }}</td>
+                                    <td>{{ item.product_fee }}</td>
+                                    <td>{{ item.cityAlias }}</td>
+                                    <td>{{ item.receiver_name }}</td>
+                                    <td>{{ item.receiver_mobile }}</td>
+                                    <td>{{ item.getPayType }}</td>
+                                    <td>{{ item.getPaymentStatus }}{{ item.getDeliveryStatus }}</td>
+                                    <td>{{ item.created_at|date('Y-m-d') }}</td>
+                                    <td>
+                                        <a href="{{ url('admin/order/view', {'id':item.id}) }}">详情</a>
+
+                                        {% if item.checkUpdate %}
+                                            <a href="{{ url('admin/order/update', {'id':item.id}) }}">修改</a>
+                                        {% endif %}
+
+                                        {% if checkUpdatePrice %}
+                                            <a href="{{ url('admin/order/update-price', {'id':item.id}) }}">修改价格</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/order'))| raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

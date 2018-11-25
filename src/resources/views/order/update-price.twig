@@ -1,0 +1,247 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}订单管理{% endblock %}
+{% set leftMenuActive='Order' %}
+
+{% block stylesheet %}
+    <style>
+        .btn-ul li {
+            float: left;
+            margin-right: 10px;
+        }
+
+        .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
+            vertical-align: middle;
+        }
+
+        .css-price-input {
+            width: 60px;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">订单管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">修改订单</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div style="margin: 10px 20px;">
+
+                <div class="mt15">
+                    <ul class="btn-ul">
+                        <a class="btn btn-default" href="javascript:window.history.go(-1);">返回</a>
+                    </ul>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="mt15">订单详情</div>
+                <table class="table mt15">
+
+                    <tr>
+                        <td>订单号</td>
+                        <td>{{ entity.number }}</td>
+                        <td>下单时间</td>
+                        <td>{{ entity.created_at }} {{ entity.getStatus }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>金额</td>
+                        <td>¥{{ entity.total_fee }} (含运费{{ entity.express_fee }})</td>
+                        <td>款项</td>
+                        <td>{{ entity.getPayType }} {{ entity.getPaymentStatus }}
+
+                            {% if entity.payment_status == constant('Entity\\Order::PAYMENT_STATUS_SUCCESS') %}
+                                (
+                                {% for item in entity.getPaymentList() %}
+                                    <span>{{ item.payTypeAlias() }}{{ item.money }}</span>
+                                {% endfor %}
+                                )
+                            {% endif %}
+
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>收货人</td>
+                        <td>{{ entity.receiver_name }} {{ entity.receiver_phone }} {{ entity.receiver_mobile }}</td>
+                        <td>运输</td>
+                        <td>{{ entity.getDeliveryType }} {{ entity.getDeliveryStatus }} ({{ entity.cityAlias() }})</td>
+                    </tr>
+
+                    <tr>
+                        <td>收货地址</td>
+                        <td colspan="3">{{ entity.getReceiverAllStage|default('') }} {{ entity.receiver_detail }}</td>
+                    </tr>
+
+                    {% if entity.delivery_status != constant('Entity\\Order::DELIVERY_STATUS_NO') %}
+                        <tr>
+                            <td>物流公司</td>
+                            <td>{{ entity.getCarrierName }}</td>
+                            <td>物流单号</td>
+                            <td>{{ entity.number }}</td>
+                        </tr>
+
+                    {% endif %}
+
+                    <tr>
+                        <td>发票</td>
+                        <td>{{ entity.getInvoiceType() }} {{ entity.invoice_title }} <span
+                                    style="color:red">{{ entity.invoice_taxpayer_ident }}</span></td>
+
+                        <td>客户留言</td>
+                        <td>{{ entity.message }}</td>
+                    </tr>
+
+                </table>
+
+                <div class="mt15">修改价格</div>
+                <form onsubmit="return false;" class="form-horizontal mt15 js-update-price-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="id" value="{{ entity.id }}">
+
+                    <table class="table mt15" id="attr_values">
+                        <tbody>
+                        <tr>
+                            <td width="100">货号</td>
+                            <td width="100">简称</td>
+                            <td>品名</td>
+                            <td width="90">规格</td>
+                            <td>备注</td>
+                            <td width="60">单价</td>
+                            <td width="50">数量</td>
+                            <td width="70">小计</td>
+                            <td width="70">单价</td>
+                            <td width="70">运费</td>
+                        </tr>
+                        {% set key = 0 %}
+                        {% for product in productArr %}
+                            {% set key = key + 1 %}
+                            <tr>
+                                <td>{{ product.product.code }}</td>
+                                <td>{{ product.product.name_short }}</td>
+                                <td style="font-size: 12px">{{ product.product_full_name }}</td>
+                                <td>
+                                    {% if product.color is not empty %}
+                                        {{ product.color }}
+                                    {% endif %}
+                                    {% if product.size is not empty %}
+                                        {{ product.size }}
+                                    {% endif %}
+                                    {% if product.version is not empty %}
+                                        {{ product.version }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ product.product.remark }}</td>
+                                <td>¥{{ product.price }}</td>
+                                <td>{{ product.quantity }}</td>
+                                <td>¥{{ product.total }}</td>
+
+                                <td>
+                                    <input type="text" class="js-product-price css-price-input js-price-input"
+                                           name="Product[{{ product.item_id }}]"
+                                           data-quantity="{{ product.quantity }}"
+                                           value="{{ product.price }}">
+                                </td>
+
+                                {% if key == 1 %}
+                                    <td rowspan="{{ productArr|length }}">
+                                        <input type="text" class="js-express-fee css-price-input js-price-input"
+                                               name="express_fee"
+                                               value="{{ entity.express_fee }}">
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+
+                    <div class="form-group">
+                        <div class="col-sm-12" style="text-align: center">
+                            <button type="submit" class="btn btn-primary js-submit">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        // 保存
+        $(".js-submit").click(function () {
+            // 验证价格
+            if(!checkPrice()) {
+                return;
+            }
+
+            // 准备数据提交
+            var data = $(".js-update-price-form").serialize()
+
+            var loading = leaf.loading().start();
+            $.ajax({
+                type: "POST",
+                url: "{{ url('admin/order/update-price') }}",
+                data: data,
+                dataType: "json",
+                success: function (result) {
+                    loading.stop();
+                    if (result.status) {
+                        leaf.toast("保存成功", function() {
+                            window.location.reload()
+                        })
+                    } else {
+                        leaf.alert(result.data)
+                    }
+                },
+                error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    loading.stop();
+                    leaf.alert("网络系统错误")
+                }
+            });
+        })
+
+        // 验证价格
+        function checkPrice() {
+            var list = $(".js-price-input")
+
+            for(var i = 0; i < list.length; i++) {
+                var price = $.trim($(list[i]).val())
+
+                if(price.length <= 0) {
+                    leaf.alert("请填写对应的金额")
+                    return false;
+                }
+
+                if(price < 0) {
+                    leaf.alert("金额不能小于0")
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+    </script>
+{% endblock %}

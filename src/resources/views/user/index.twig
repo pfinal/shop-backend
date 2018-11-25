@@ -1,0 +1,102 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}会员管理{% endblock %}
+{% set leftMenuActive='User' %}
+
+{% block contentRight %}
+    <div class="page-title">会员管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">会员列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                <form action="{{ url('admin/user') }}" method="get" class="form-inline form-search mt15">
+
+                    {#<div class="form-group">
+                        <label>帐号</label>
+                        <input type="text" name="User[username]" class="form-control"
+                               value="{{ app.request.get('User').username|default('') }}">
+                    </div>#}
+                    <div class="form-group">
+                        <label>手机</label>
+                        <input type="text" name="User[mobile]" class="form-control"
+                               value="{{ app.request.get('User').mobile|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <input type="text" name="User[nickname]" class="form-control"
+                               value="{{ app.request.get('User').nickname|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+                    {% if app.request.get('User') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/user') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mt15">
+                            <thead>
+                            <tr>
+                                <th width="60">ID</th>
+                                <th width="160">注册时间</th>
+                                {#<th>帐号</th>#}
+                                <th>手机</th>
+                                <th>昵称</th>
+                                <th>邮箱</th>
+                                <th>来源</th>
+                                <th>状态</th>
+                                {#<th>操作</th>#}
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.created_at }}</td>
+                                    <td>{{ item.mobile }}</td>
+                                    {#<td>{{ item.username }}</td>#}
+                                    <td>{{ item.nickname }}</td>
+                                    <td>{{ item.email }}</td>
+                                    <td>{{ item.getRefereeUserNickname() }}</td>
+                                    <td>{{ item.getStatus }}</td>
+                                    {#<td>#}
+                                    {#<a href="{{ url('admin/user/delete', {'id':item.id}) }}" class="leaf-confirm">删除</a>#}
+                                    {#</td>#}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/user'))|raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

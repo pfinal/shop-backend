@@ -1,0 +1,330 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}订单管理{% endblock %}
+{% set leftMenuActive='Order' %}
+
+{% block stylesheet %}
+    <style>
+        .btn-ul li {
+            float: left;
+            margin-right: 10px;
+        }
+
+        .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
+            vertical-align: middle;
+        }
+
+        .css-price-input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .css-address-input {
+            float: left;
+            margin-right: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">订单管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">修改订单</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div style="margin: 10px 20px;">
+
+                <div class="mt15">
+                    <ul class="btn-ul">
+                        <a class="btn btn-default" href="javascript:window.history.go(-1);">返回</a>
+                    </ul>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                <form action="{{ url('admin/order/update') }}" method="post" class="form-horizontal mt15">
+
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="id" value="{{ entity.id }}">
+
+                    <div class="mt15">订单详情</div>
+                    <table class="table mt15">
+
+                        <tr>
+                            <td>订单号</td>
+                            <td>{{ entity.number }}</td>
+                            <td>下单时间</td>
+                            <td>{{ entity.created_at }} {{ entity.getStatus }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>金额</td>
+                            <td>¥{{ entity.total_fee }} (含运费{{ entity.express_fee }})</td>
+                            <td>款项</td>
+                            <td>{{ entity.getPayType }} {{ entity.getPaymentStatus }}
+
+                                {% if entity.payment_status == constant('Entity\\Order::PAYMENT_STATUS_SUCCESS') %}
+                                    {% set paymentList = entity.getPaymentList() %}
+                                    {% if paymentList|length > 0 %}
+                                        (
+                                        {% for item in entity.getPaymentList() %}
+                                            <span>{{ item.payTypeAlias() }}{{ item.money }}</span>
+                                        {% endfor %}
+                                        )
+                                    {% endif %}
+                                {% endif %}
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>发票</td>
+                            <td>{{ entity.getInvoiceType() }} {{ entity.invoice_title }} <span
+                                        style="color:red">{{ entity.invoice_taxpayer_ident }}</span></td>
+
+                            <td>客户留言</td>
+                            <td>{{ entity.message }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>运输</td>
+                            <td colspan="3">{{ entity.getDeliveryType }} {{ entity.getDeliveryStatus }}
+                                ({{ entity.cityAlias() }})
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>收货人</td>
+                            <td><input type="text"
+                                       class="form-control"
+                                       name="Order[receiver_name]"
+                                       value="{{ app.request.get('Order').receiver_name|default(entity.receiver_name) }}">
+                            </td>
+                            <td>收货联系方式</td>
+                            <td><input type="text"
+                                       class="form-control"
+                                       name="Order[receiver_mobile]"
+                                       value="{{ app.request.get('Order').receiver_mobile|default(entity.receiver_mobile) }}">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>收货地址</td>
+                            <td colspan="3" style="overflow: hidden">
+
+                                {% autoescape false %}
+                                    {{ app.html.dropDownList('Order[receiver_province]', app.request.get('Order').receiver_province|default(entity.receiver_province), provinceList,{'class':'form-control js-province css-address-input', 'style': 'width: 100px'}) }}
+                                {% endautoescape %}
+
+                                {% autoescape false %}
+                                    {{ app.html.dropDownList('Order[receiver_city]', app.request.get('Order').receiver_city|default(entity.receiver_city), cityList,{'class':'form-control js-city css-address-input', 'style': 'width: 100px'}) }}
+                                {% endautoescape %}
+
+                                {% autoescape false %}
+                                    {{ app.html.dropDownList('Order[receiver_district]', app.request.get('Order').receiver_district|default(entity.receiver_district), districtList,{'class':'form-control js-district css-address-input', 'style': 'width: 100px'}) }}
+                                {% endautoescape %}
+
+                                <input type="text"
+                                       class="form-control css-address-input"
+                                       name="Order[receiver_detail]"
+                                       style="width: 300px;"
+                                       value="{{ app.request.get('Order').receiver_detail|default(entity.receiver_detail) }}">
+                            </td>
+                        </tr>
+
+                        {% if entity.delivery_status != constant('Entity\\Order::DELIVERY_STATUS_NO') %}
+                            <tr>
+                                <td>物流公司</td>
+                                <td>{{ entity.getCarrierName }}</td>
+                                <td>物流单号</td>
+                                <td>{{ entity.number }}</td>
+                            </tr>
+
+                        {% endif %}
+
+                    </table>
+
+                    <div class="mt15">商品详情</div>
+                    <table class="table mt15" id="attr_values">
+                        <tbody>
+                        <tr>
+                            {#<td width="50">SKU</td>#} {# 20181117注释:这里展示sku的ID给用户看是没有意义的(wangmanyuan) #}
+                            <td width="100">货号</td>
+                            <td width="120">简称</td>
+                            <td>品名</td>
+                            <td width="90">规格</td>
+                            <td>备注</td>
+                            <td width="60">价格</td>
+                            <td width="50">数量</td>
+                            <td width="70">小计</td>
+                        </tr>
+                        {% for product in productArr %}
+                            <tr>
+                                {#<td>{{ product.sku_id }}</td>#}
+                                <td>{{ product.product.code }}</td>
+                                <td>{{ product.product.name_short }}</td>
+                                <td style="font-size: 12px">{{ product.product_full_name }}</td>
+                                <td>
+                                    {% if product.color is not empty %}
+                                        {{ product.color }}
+                                    {% endif %}
+                                    {% if product.size is not empty %}
+                                        {{ product.size }}
+                                    {% endif %}
+                                    {% if product.version is not empty %}
+                                        {{ product.version }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ product.product.remark }}</td>
+                                <td>¥{{ product.price }}</td>
+                                <td>{{ product.quantity }}</td>
+                                <td class="golden">¥{{ product.total }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>合计</td>
+                            <td colspan="50" style="text-align: right">¥{{ entity.product_fee }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="form-group">
+                        <div class="col-sm-12" style="text-align: center">
+                            <button type="submit" class="btn btn-primary js-submit">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{{ asset('static/art-template/template-native.js') }}"></script>
+
+    <script id="tpl-city-option" type="text/html">
+        <% for(i in list) { %>
+        <option value="<%= list[i]['code'] %>" <% if(list[i]['code'] == selectedCode) { %>selected<% } %>><%= list[i]['name'] %></option>
+        <% } %>
+    </script>
+
+    <script>
+        // 准备数据
+        $(function () {
+
+        })
+
+        $(".js-province").change(function () {
+            cityByProvince()
+        })
+
+        $(".js-city").change(function () {
+            districtByCity()
+        })
+
+        // 根据省获取市
+        function cityByProvince() {
+            var provinceCode = $(".js-province").val()
+
+            if (!provinceCode) {
+                leaf.alert("请正确选择")
+                return;
+            }
+
+            var loading = leaf.loading().start();
+            $.ajax({
+                type: "POST",
+                url: "{{ url('admin/order/region-by-pcode') }}",
+                data: {
+                    '_token': $("input[name='_token']").val(),
+                    'provinceCode': provinceCode,
+                },
+                dataType: "json",
+                success: function (result) {
+                    loading.stop();
+                    if (result.status) {
+
+                        var html = template('tpl-city-option', {
+                            'list': result.data
+                        })
+
+                        $(".js-city").html(html)
+
+                        districtByCity()
+
+                    } else {
+                        leaf.alert(result.data);
+                    }
+                },
+                error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    loading.stop();
+                    leaf.alert("网络系统错误");
+                }
+            });
+        }
+
+        // 根据市获取区
+        function districtByCity() {
+            var provinceCode = $(".js-province").val()
+            var cityCode = $(".js-city").val()
+
+            if (!provinceCode) {
+                leaf.alert("请正确选择")
+                return;
+            }
+
+            if (!cityCode) {
+                leaf.alert("请正确选择")
+                return;
+            }
+
+            var loading = leaf.loading().start();
+            $.ajax({
+                type: "POST",
+                url: "{{ url('admin/order/region-by-pcode') }}",
+                data: {
+                    '_token': $("input[name='_token']").val(),
+                    'provinceCode': provinceCode,
+                    'cityCode': cityCode,
+                },
+                dataType: "json",
+                success: function (result) {
+                    loading.stop();
+                    if (result.status) {
+
+                        var html = template('tpl-city-option', {
+                            'list': result.data
+                        })
+
+                        $(".js-district").html(html)
+
+                    } else {
+                        leaf.alert(result.data);
+                    }
+                },
+                error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    loading.stop();
+                    leaf.alert("网络系统错误");
+                }
+            });
+        }
+
+
+    </script>
+{% endblock %}

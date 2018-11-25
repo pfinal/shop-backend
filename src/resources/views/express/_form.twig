@@ -1,0 +1,177 @@
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name">模板名称</label>
+    <div class="col-sm-8">
+        <input type="text" name="Express[name]" class="form-control js-check-submit-item"
+               value="{{ app.request.get('Express').name|default(entity.name) }}" id="input-name">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-consign">发货时间</label>
+    <div class="col-sm-8">
+        <input type="text" name="Express[consign]" class="form-control js-check-submit-item"
+               value="{{ app.request.get('Express').consign|default(entity.consign) }}" id="input-consign">
+        <span class="help-block">如：72小时内</span>
+    </div>
+</div>
+
+{% set wayCommon = entity.wayCommon() %}
+{% set wayAppointList = entity.wayAppointList() %}
+{% set freeList = entity.freeList() %}
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">运送方式</label>
+    <div class="col-sm-8">
+
+        <div>
+            {% autoescape false %}
+                {{ app.html.checkBoxList('', '10' , {'10':'快递'},{'labelOptions':{'class':'checkbox-inline js-disabled-check','style':'line-height:normal;'}}) }}
+            {% endautoescape %}
+        </div>
+
+        <div class="express-way-div-item">
+
+            <div class="data-div">
+                <div class="normal-data">
+                    <span class="text">默认运费&nbsp;&nbsp;</span>
+                    <input type="text" class="input js-check-submit-item" name="ExpressWayCommon[basic]"
+                           value="{{ app.request.get('ExpressWayCommon').basic|default(wayCommon.basic|default('')) }}">
+                    <span class="text">&nbsp;件内&nbsp;&nbsp;</span>
+                    <input type="text" class="input js-check-submit-item" name="ExpressWayCommon[fee]"
+                           value="{{ app.request.get('ExpressWayCommon').fee|default(wayCommon.fee|default('')) }}">
+                    <span class="text">元，&nbsp;&nbsp;每增加&nbsp;&nbsp;</span>
+                    <input type="text" class="input" name="ExpressWayCommon[add_data]"
+                           value="{{ app.request.get('ExpressWayCommon').add_data|default(wayCommon.add_data|default('')) }}">
+                    <span class="text">件，&nbsp;&nbsp;增加运费&nbsp;&nbsp;</span>
+                    <input type="text" class="input js-check-submit-item" name="ExpressWayCommon[add_fee]"
+                           value="{{ app.request.get('ExpressWayCommon').add_Fee|default(wayCommon.add_fee|default('')) }}">
+                    <span class="text">&nbsp;元</span>
+                </div>
+
+                <div class="region-table-div js-appoint-way"
+                     style="{% if wayAppointList|length > 0 %}display: block;{% else %}display:none;{% endif %}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="region">运送到</th>
+                            <th>首件数(件)</th>
+                            <th>首费(元)</th>
+                            <th>续件数(件)</th>
+                            <th>续费(元)</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+
+                        <tbody class="js-appoint-way-show-div">
+                        {% for key,wayItem in wayAppointList %}
+                            <tr data-index="{{ key }}">
+                                <td>
+                                    <div class="css-appoint-way-region-div js-region-all-div-item"
+                                         data-index="{{ key }}">
+                                        <div class="region-data js-region-selected-data-div">
+                                            <div class="js-region-selected-data">{{ wayItem.regionAlias() }}</div>
+
+                                            <input type="hidden" value="{{ wayItem.region_codes }}"
+                                                   name="ExpressWayAppoint[{{ key }}][region_codes]">
+                                        </div>
+
+                                        <a href="javascript:;"
+                                           class="region-action js-region-add-a js-check-submit-item">编辑</a>
+                                    </div>
+
+                                </td>
+                                <td><input type="text" class="input js-check-submit-item"
+                                           name="ExpressWayAppoint[{{ key }}][basic]" value="{{ wayItem.basic }}">
+                                </td>
+                                <td><input type="text" class="input js-check-submit-item"
+                                           name="ExpressWayAppoint[{{ key }}][fee]" value="{{ wayItem.fee }}">
+                                </td>
+                                <td><input type="text" class="input js-check-submit-item"
+                                           name="ExpressWayAppoint[{{ key }}][add_data]"
+                                           value="{{ wayItem.add_data }}"></td>
+                                <td><input type="text" class="input js-check-submit-item"
+                                           name="ExpressWayAppoint[{{ key }}][add_fee]"
+                                           value="{{ wayItem.add_fee }}"></td>
+                                <td><a href="javascript:;" class="js-region-delete js-check-submit-item">删除</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <div class="action-div">
+                <span class="js-add-appoint-way js-check-submit-item">为指定地区城市设置运费+</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<hr>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-consign"></label>
+    <div class="col-sm-8">
+        <div class="free-a">
+            <span class="js-express-free-way-add js-check-submit-item">指定条件包邮+</span>
+        </div>
+
+        <div class="express-way-div-item js-express-free-way-div"
+             style="{% if freeList|length > 0 %}display:block;{% else %}display: none;{% endif %}">
+            <div class="data-div">
+
+                <div class="region-table-div">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="region">选择地区</th>
+                            <th>运送方式</th>
+                            <th>包邮条件</th>
+                            <th>包邮数据</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+
+                        <tbody class="js-express-free-way-tbody">
+                        {% for key,freeItem in freeList %}
+                            <tr data-index="{{ key }}">
+                                <td>
+                                    <div class="css-appoint-way-region-div js-region-all-div-item"
+                                         data-index="{{ key }}">
+                                        <div class="region-data js-region-selected-data-div">
+                                            <div class="js-region-selected-data">{{ freeItem.regionAlias }}</div>
+
+                                            <input type="hidden" name="ExpressFree[{{ key }}][region_codes]"
+                                                   value="{{ freeItem.region_codes }}">
+                                        </div>
+
+                                        <a href="javascript:;"
+                                           class="region-action js-region-add-a js-check-submit-item">编辑</a>
+                                    </div>
+
+                                </td>
+                                <td>快递</td>
+                                <td>金额</td>
+                                <td>满&nbsp;<input type="text" class="input js-check-submit-item"
+                                                  name="ExpressFree[{{ key }}][money]"
+                                                  value="{{ freeItem.money }}">&nbsp;元包邮
+                                </td>
+                                <td><a href="javascript:;"
+                                       class="js-express-free-way-region-delete js-check-submit-item">删除</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+

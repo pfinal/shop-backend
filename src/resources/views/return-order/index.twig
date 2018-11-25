@@ -1,0 +1,113 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}退货管理{% endblock %}
+{% set leftMenuActive='ReturnOrder' %}
+
+{% block contentRight %}
+    <div class="page-title">退货管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+
+            {% for key,name in statusList %}
+                <li class="{% if status == key %}active{% endif %}">
+                    <a href="{{ url('admin/return-order',{'status': key}) }}">{{ name }}</a>
+                </li>
+            {% endfor %}
+
+            <li class="{% if status == 0 %}active{% endif %}">
+                <a href="{{ url('admin/return-order') }}">全部</a>
+            </li>
+
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                <form action="{{ url('admin/return-order') }}" method="get" class="form-inline form-search mt15">
+
+                    <div class="form-group">
+                        <label>联系人</label>
+                        <input type="text" name="ReturnOrder[contact]" class="form-control"
+                               value="{{ app.request.get('ReturnOrder').contact|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="text" name="ReturnOrder[mobile]" class="form-control"
+                               value="{{ app.request.get('ReturnOrder').mobile|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('ReturnOrder') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/return-order') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mt15">
+                            <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>商品名称</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>退货原因</th>
+                                <th>退货状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                    <td>{{ item.getOrderNumber }}</td>
+                                    <td>{{ item.getProductName }}</td>
+                                    <td>{{ item.contact }}</td>
+                                    <td>{{ item.mobile }}</td>
+                                    <td>{{ item.getMessage }}</td>
+                                    <td>{{ item.getStatus }}</td>
+                                    <td>
+                                        {% if item.status == constant('Entity\\ReturnOrder::STATUS_APPLICATION') %}
+                                            <a href="{{ url('admin/return-order/deal', {'id':item.id}) }}">退货处理</a>
+                                        {% endif %}
+
+                                        {% if item.checkFinishAction() %}
+                                            <a href="{{ url('admin/return-order/finish', {'id':item.id}) }}" class="leaf-confirm">确认收货</a>
+                                        {% endif %}
+
+                                        <a href="{{ url('admin/return-order/view', {'id':item.id}) }}">详情</a>
+                                        {#<a href="{{ url('admin/return-order/delete', {'id':item.id}) }}" class="leaf-confirm">删除</a>#}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/return-order'))|raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

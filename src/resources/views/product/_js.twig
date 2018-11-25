@@ -1,0 +1,84 @@
+<link rel="stylesheet" href="{{ asset('static/jquery-file-upload/css/jquery.fileupload.css') }}">
+
+<script src="{{ asset('static/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}"></script>
+<script src="{{ asset('static/jquery-file-upload/js/jquery.iframe-transport.js') }}"></script>
+<script src="{{ asset('static/jquery-file-upload/js/jquery.fileupload.js') }}"></script>
+<script>
+    $(function () {
+        'use strict';
+
+        var url = '{{ url('admin/product/upload') }}';
+
+        $('.fileupload').fileupload({
+            url: url,
+            dataType: 'json',
+            done: function (e, data) {
+                var showDiv = $(e.target).attr("data-show");
+
+                $(".js-img-progress[data-show='" + showDiv + "']").hide(); //隐藏进度条
+
+                //e.target 当前点击的按扭
+                showImage(data.result.file, showDiv)
+            },
+            progressall: function (e, data) {
+                var showDiv = $(e.target).attr("data-show");
+
+                $(".js-img-progress[data-show='" + showDiv + "']").show();
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('.js-img-progress[data-show="' + showDiv + '"] .progress-bar').css('width', progress + '%');
+            }
+        });
+
+        function showImage(file, showDivSel) {
+            var showDiv = $(showDivSel);
+            var tempUrl = file.thumbnailUrl._temp; //预览临时图片
+
+            var item = $("<div class='img-item'>")
+
+            // $('<img>').attr('src', tempUrl).css("height", "90px").appendTo(item);
+
+            if(showDivSel == '.js-show-content-images') {
+                $('<img>').attr('src', tempUrl).css("width", "150").appendTo(item);
+            } else {
+                $('<img>').attr('src', tempUrl).css("height", "90px").appendTo(item);
+            }
+
+            //是否主图
+            if (showDivSel === '.show-cover') {
+                //主图只有一张
+                showDiv.html('')
+                $('<input type="hidden" name="coverFileKey">').val(file.fileKey).appendTo(item);
+            } else if(showDivSel == '.js-show-content-images') {
+                // 图文详情
+                //详情多有多张
+                $('<input type="hidden" name="contentImgFileKeys[]">').val(file.fileKey).appendTo(item);
+                //删除按扭
+                $("<span class='js-remove glyphicon glyphicon-remove'></span>").appendTo(item)
+
+            } else if(showDivSel == '.js-product-image-show') {
+                //详情多有多张
+                $('<input type="hidden" name="fileKeys[]">').val(file.fileKey).appendTo(item);
+                //删除按扭
+                $("<span class='js-remove glyphicon glyphicon-remove'></span>").appendTo(item)
+            }
+
+            item.appendTo(showDiv)
+        }
+
+        //删除图片
+        $(document).on('click', '.js-remove', function () {
+
+            var img = $(this).parent('.img-item').find("img")
+
+            var id = img.attr("data-image-id")
+
+            //已上传成功的正式图片，才有id
+            if (id) {
+
+            }
+
+            img.parents('.img-item').remove();
+        })
+
+    });
+</script>

@@ -1,0 +1,120 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}拼团订单{% endblock %}
+{% set leftMenuActive='SpellOrder' %}
+
+{% block contentRight %}
+    <div class="page-title">拼团订单</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+
+            {% for key,item in statusList %}
+                <li class="{% if app.request.get('status') == key %}active{% endif %}">
+                    <a href="{{ url('admin/spell-order',{'status': key}) }}">{{ item }}</a>
+                </li>
+            {% endfor %}
+
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/spell-order') }}" method="get" class="form-inline form-search mt15">#}
+                {#<div class="form-group">#}
+                {#<label>订单号</label>#}
+                {#<input type="text" name="Search[number]" class="form-control"#}
+                {#value="{{ app.request.get('Search').number|default('') }}">#}
+                {#</div>#}
+
+                {#<div class="form-group">#}
+                {#<label>收货人</label>#}
+                {#<input type="text" name="Search[receiver_name]" class="form-control"#}
+                {#value="{{ app.request.get('Search').receiver_name|default('') }}">#}
+                {#</div>#}
+
+                {#<div class="form-group">#}
+                {#<label>收货手机</label>#}
+                {#<input type="text" name="Search[receiver_mobile]" class="form-control"#}
+                {#value="{{ app.request.get('Search').receiver_mobile|default('') }}">#}
+                {#</div>#}
+
+                {#<button type="submit" class="btn btn-primary btn-sm">#}
+                {#<span class="glyphicon glyphicon-search"></span> 搜索#}
+                {#</button>#}
+
+                {#{% if app.request.get('Search') %}#}
+                {#<a class="btn btn-default btn-sm" href="{{ url('admin/spell-order') }}">#}
+                {#<span class="glyphicon glyphicon-repeat"></span> 清空条件</a>#}
+                {#{% endif %}#}
+
+                {#</form>#}
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div>
+                        <table class="table table-hover mt15">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th style="width: 50%;">商品</th>
+                                <th>团购价</th>
+                                <th>会员</th>
+                                <th>拼团时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% set spellId = '' %}
+                            {% set first = 1 %}
+                            {% for item in list %}
+                                {% if spellId != item.spell_id %}
+                                    {% set spellId = item.spell_id %}
+                                    {% set first = 1 %}
+                                {% else %}
+                                    {% set first = 0 %}
+                                {% endif %}
+
+                                <tr>
+                                    <td>
+                                        {% if first == 1 %}
+                                            团长
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.productInfo().name }}</td>
+                                    <td>{{ item.price }}</td>
+                                    <td>{{ item.userInfo().nickname }}</td>
+                                    <td>{{ item.created_at }}</td>
+                                    <td>
+                                        {% if item.status == constant('Entity\\Spell::STATUS_SUCCESS') %}
+                                            <a href="{{ url('admin/order/view', {'id':item.id}) }}">订单详情</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/spell-order'))| raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

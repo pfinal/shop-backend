@@ -1,0 +1,99 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}订单管理{% endblock %}
+{% set leftMenuActive='Order' %}
+
+{% block contentRight %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="page-title">订单管理</div>
+        <div class="content-top">
+            <ul class="top-nav">
+                <li class="active"><a href="">订单发货</a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+
+        {# 一次性消息提示 #}
+        {% include 'message.twig' %}
+
+        <div class="row" style="margin: 15px 15px;">
+            <div class="col-md-12">
+
+                <form action="{{ url('admin/order/delivery', {'id':entity.id}) }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <div>发货信息</div>
+                    <table class="table mt15">
+                        <tbody>
+                        <tr>
+                            <td>订单编号</td>
+                            <td>{{ entity.number }}
+                                <input type="hidden" name="Delivery[order_id]" value="{{ entity.id }}">
+                            </td>
+                            <td></td>
+                            <td>下单时间</td>
+                            <td>{{ entity.created_at }}</td>
+                        </tr>
+                        <tr>
+                            <td>支付方式</td>
+                            <td>{{ entity.getPayType?entity.getPayType:'-' }}</td>
+                            <td></td>
+                            <td>配送费用</td>
+                            <td>{{ entity.express_fee }}</td>
+                        </tr>
+                        <tr>
+                            <td> 物流公司</td>
+                            <td>
+                                {% autoescape false %}
+                                    {{ app.html.dropDownList('Delivery[carrier_id]',app.request.get('Delivery[carrier_id]')|default(''),
+                                    carrier?carrier:'-' ,{'class':'form-control'}) }}
+                                {% endautoescape %}
+                            </td>
+                            <td></td>
+                            <td>物流单号</td>
+                            <td><input class="form-control"  type="text" name="Delivery[number]"></td>
+                        </tr>
+                        <tr>
+                            <td>收货人姓名</td>
+                            <td>{{ entity.receiver_name }}</td>
+                            <td></td>
+                            <td>联系手机</td>
+                            <td>{{ entity.receiver_mobile }} </td>
+                        </tr>
+                        <tr>
+                            <td>联系电话</td>
+                            <td> {{ entity.receiver_phone }} </td>
+                            <td></td>
+                            <td>邮编</td>
+                            <td>{{ entity.receiver_zip }}</td>
+                        </tr>
+                        <tr>
+                            <td>收货地区</td>
+                            <td> {{ entity.getReceiverAllStage|default('') }} </td>
+                            <td></td>
+                            <td>收货地址</td>
+                            <td> {{ entity.receiver_detail }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>用户备注</td>
+                            <td>{{ entity.message }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-primary" style="margin-left: 380px;">发 货</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

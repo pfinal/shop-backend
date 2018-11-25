@@ -1,0 +1,57 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}分类管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+
+    <div class="page-title">分类管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">新增分类</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form action="{{ url('admin/category/create') }}{% if entity.childCreate is defined %}?id={{ app.request.get('id') }}{% endif %}
+                " method="post" class="form-horizontal mt15">
+
+                    {{ include('@AdminBundle/category/_form.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {% include '@AdminBundle/category/_js.twig' %}
+
+    <script>
+        $(function () {
+            $(document).on('submit', '.form-horizontal', function () {
+                $('[type="checkbox"]').removeAttr('disabled');
+            })
+        })
+    </script>
+{% endblock %}

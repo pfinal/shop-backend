@@ -1,0 +1,152 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">新增商品</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form action="{{ url('admin/product/create') }}" method="post" class="form-horizontal mt15">
+
+                    {{ include('@AdminBundle/product/_form.twig') }}
+
+                    {{ include('@AdminBundle/product/_form-footer-content.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary js-submit">提交</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+    {% include '@AdminBundle/product/_js.twig' %}
+
+    <script>
+        // 分类选择，判断是否为单属性，单属性则打开价格
+        $(".js-category-select").change(function () {
+            checkOneSku()
+        })
+
+        $(function () {
+            checkOneSku()
+        })
+
+        // 根据分类判断价格是否展示
+        function checkOneSku() {
+            var categoryId = $(".js-category-select").val()
+
+            if (!categoryId) {
+                $(".js-one-sku").addClass("hide")
+                return;
+            }
+
+            // 判断分类是否为单属性
+            $.ajax({
+                type: "POST",
+                url: "{{ url('admin/category/check-one') }}",
+                data: {
+                    'id': categoryId,
+                    '_token': '{{ csrf_token() }}',
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result.status) {
+                        if (result.data['one'] == 1) {
+                            $(".js-one-sku").removeClass("hide")
+                            return;
+                        }
+
+                        $(".js-one-sku").addClass("hide")
+                    } else {
+                        leaf.alert(result.data)
+                    }
+                },
+                error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    leaf.alert('网络系统错误');
+                }
+            });
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('.js-date').datetimepicker({
+                language: 'zh-CN',
+                weekStart: 0,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2
+            });
+        })
+    </script>
+
+    <script type="text/javascript">
+
+        //编辑器id
+        var editorId = 'input-description';
+
+        //实例化编辑器
+        var ue = UE.getEditor(editorId, {
+            serverUrl: "{{ url('ueditor') }}",
+            //initialContent: '欢迎使用ueditor!',  //初始化编辑器的内容,也可以通过textarea/script 给值
+            autoHeightEnabled: true,
+            autoFloatEnabled: true,
+            enableAutoSave: false,
+            saveInterval: 1000 * 60 * 60,
+            iframeCssUrl: '{{ asset('static/ueditor/iframe.css') }}',
+            toolbars: [[
+                'fullscreen',
+                'source', 'emotion', 'fontfamily', 'fontsize', 'bold', 'italic', 'underline', 'fontborder', 'strikethrough',
+                'justifyleft', 'justifyright', 'justifycenter',
+                'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'pasteplain',
+                'removeformat', 'formatmatch', 'autotypeset', 'simpleupload',
+                'undo', 'redo'
+            ]]
+        });
+
+        //初始化完毕同步编辑器内容到textarea中
+        ue.ready(function () {
+            //ue.setContent('欢迎使用ueditor',true); //追加内容到编辑器
+            var content = this.getContent();
+            $("#" + editorId).val(content);
+        });
+
+        //失去焦点时自动同步编辑器内容到textarea中
+        ue.onblur = function () {
+            var content = this.getContent();
+            $("#" + editorId).val(content);
+        };
+
+    </script>
+
+
+{% endblock %}

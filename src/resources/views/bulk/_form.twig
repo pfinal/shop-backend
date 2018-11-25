@@ -1,0 +1,81 @@
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">状态</label>
+    <div class="col-sm-8">
+        {% autoescape false %}
+            {{ app.html.radioButtonList('bulk', app.request.get('bulk')|default(entity.id?constant('AdminBundle\\Controller\\BulkController::BULK_YES'):constant('AdminBundle\\Controller\\BulkController::BULK_NO')) , bulkList,{'labelOptions':{'class':'radio-inline js-bulk-select'}} ) }}
+        {% endautoescape %}
+    </div>
+</div>
+
+<div class="form-group js-bulk-div css-bulk-div">
+    <label class="col-sm-2 control-label" for="input-person">人数</label>
+    <div class="col-sm-8">
+        <input type="text" name="Bulk[person]" class="form-control"
+               value="{{ app.request.get('Bulk').person|default(entity.person) }}" id="input-person">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group js-bulk-div css-bulk-div">
+    <label class="col-sm-2 control-label" for="input-valid_start">有效开始日期</label>
+    <div class="col-sm-8">
+        <input type="text" name="Bulk[valid_start]" class="form-control js-date" data-date-format="yyyy-mm-dd"
+               value="{{ app.request.get('Bulk').valid_start|default(entity.valid_start == '1970-01-01'?'':entity.valid_start) }}"
+               id="input-valid_start">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group js-bulk-div css-bulk-div">
+    <label class="col-sm-2 control-label" for="input-valid_end">有效结束日期</label>
+    <div class="col-sm-8">
+        <input type="text" name="Bulk[valid_end]" class="form-control js-date" data-date-format="yyyy-mm-dd"
+               value="{{ app.request.get('Bulk').valid_end|default(entity.valid_end == '1970-01-01'?'':entity.valid_end) }}"
+               id="input-valid_end">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+{% if propertyList|length <= 0 %}
+    {% for item in skuList %}
+        {% set skuId = item.id %}
+        {% set bulkSkuInfo = item.bulkSkuInfo() %}
+        <div class="form-group js-bulk-div css-bulk-div">
+            <label class="col-sm-2 control-label">团购价</label>
+            <div class="col-sm-8">
+                <input type="text" name="Sku[{{ skuId }}][price]" class="form-control"
+                       value="{{ app.request.get('Sku').skuId.price|default(bulkSkuInfo.price|default('')) }}">
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+
+    <div class="form-group js-bulk-div css-bulk-div">
+        <label class="col-sm-2 control-label">属性</label>
+        <div class="col-sm-8">
+
+            <table class="table">
+                <tr>
+                    <th><span class="form-control">属性组合</span></th>
+                    <th><span class="form-control price-form-input">团购价</span></th>
+                </tr>
+                {% for item in skuList %}
+                    {% set skuId = item.id %}
+                    {% set bulkSkuInfo = item.bulkSkuInfo() %}
+                    <tr>
+                        <td>{{ item.getSkuInfo.show }}</td>
+                        <td>
+                            <input type="text" name="Sku[{{ skuId }}][price]" class="form-control"
+                                   value="{{ app.request.get('Sku').skuId.price|default(bulkSkuInfo.price|default('')) }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endif %}
+
+

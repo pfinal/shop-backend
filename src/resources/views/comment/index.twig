@@ -1,0 +1,102 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品评论管理{% endblock %}
+{% set leftMenuActive='Comment' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品评论管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">商品评论列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/comment') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Search[id]" class="form-control"
+                               value="{{ app.request.get('Search').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>订单ID</label>
+                        <input type="text" name="Search[order_id]" class="form-control"
+                               value="{{ app.request.get('Search').order_id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>商品ID</label>
+                        <input type="text" name="Search[product_id]" class="form-control"
+                               value="{{ app.request.get('Search').product_id|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Search') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/comment') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 列表 #}
+                {% if dataProvider.data is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>订单编号</th>
+                                <th>会员昵称</th>
+                                <th>会员手机号</th>
+                                <th>服务(5分)</th>
+                                <th>物流(5分)</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in dataProvider.data %}
+                                {% set orderInfo = item.orderInfo() %}
+                                {% set userInfo = item.userInfo() %}
+                                <tr>
+                                    <td>{{ orderInfo.number }}</td>
+                                    <td>{{ userInfo.nickname }}</td>
+                                    <td>{{ userInfo.mobile }}</td>
+                                    <td>{{ item.service }}</td>
+                                    <td>{{ item.express }}</td>
+                                    <td>{{ item.created_at }}</td>
+                                    <td>
+                                        <a href="{{ url('admin/comment/product', {'orderId': orderInfo.id}) }}">商品评价</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ dataProvider.page.itemCount }} </strong>条记录 </span>
+                    {{ dataProvider.page.createLinks(url('admin/comment')) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

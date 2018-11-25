@@ -1,0 +1,120 @@
+<div class="mt15">退货详情</div>
+<table class="table mt15">
+
+    <tr>
+        <td>申请时间</td>
+        <td>{{ entity.created_at }}</td>
+        <td>退货状态</td>
+        <td>{{ entity.getStatus }}</td>
+    </tr>
+
+    <tr>
+        <td>订单号</td>
+        <td>{{ orderInfo.number }}</td>
+        <td>订单金额</td>
+        <td>{{ orderInfo.total_fee }}(包含运费{{ orderInfo.express_fee }})</td>
+    </tr>
+
+    <tr>
+        <td>下单人</td>
+        <td>{{ entity.nickname }}</td>
+        <td>订单状态</td>
+        <td>{{ orderInfo.showStatusStrForApi() }}</td>
+    </tr>
+
+    <tr>
+        <td>联系人</td>
+        <td>{{ entity.contact }}</td>
+        <td>联系方式</td>
+        <td>{{ entity.mobile }}</td>
+    </tr>
+
+    <tr>
+        <td>退货原因</td>
+        <td colspan="3">{{ entity.message }}</td>
+    </tr>
+
+    {% if entity.status == constant('Entity\\ReturnOrder::STATUS_AGREE') or entity.status == constant('Entity\\ReturnOrder::STATUS_FINISH') %}
+        <tr>
+            <td>退款金额</td>
+            <td colspan="3">
+                ¥ {{ entity.refund_fee }}
+            </td>
+        </tr>
+    {% endif %}
+
+    {% if entity.status == constant('Entity\\ReturnOrder::STATUS_REFUSE') %}
+        <tr>
+            <td>拒绝理由</td>
+            <td colspan="3">{{ entity.reply }}</td>
+        </tr>
+    {% endif %}
+
+</table>
+
+<div class="mt15">订单支付记录</div>
+<table class="table mt15" id="attr_values">
+    <tbody>
+    <tr>
+        <td width="100">支付方式</td>
+        <td width="120">支付金额</td>
+        <td width="120">退款金额</td>
+    </tr>
+
+    {% for item in paymentList %}
+        <tr>
+            <td>{{ item.payTypeAlias() }}</td>
+            <td>{{ item.money }}</td>
+            <td>{{ item.refundMoney() }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<div class="mt15">商品详情(标红为退款商品)</div>
+<table class="table mt15" id="attr_values">
+    <tbody>
+    <tr>
+        {#<td width="50">SKU</td>#} {# 20181117注释:这里展示sku的ID给用户看是没有意义的(wangmanyuan) #}
+        <td width="100">货号</td>
+        <td width="120">简称</td>
+        <td>品名</td>
+        <td width="90">规格</td>
+        <td>备注</td>
+        <td>状态</td>
+        <td width="60">价格</td>
+        <td width="50">数量</td>
+        <td width="70" class="golden last-td">小计</td>
+    </tr>
+    {% for product in productArr %}
+        <tr class="{% if product.order_item_id == entity.order_item_id %}active{% endif %}">
+            {#<td>{{ product.sku_id }}</td>#}
+            <td>{{ product.product.code }}</td>
+            <td>{{ product.product.name_short }}</td>
+            <td style="font-size: 12px">{{ product.product_full_name }}</td>
+            <td>
+                {% if product.color is not empty %}
+                    {{ product.color }}
+                {% endif %}
+                {% if product.size is not empty %}
+                    {{ product.size }}
+                {% endif %}
+                {% if product.version is not empty %}
+                    {{ product.version }}
+                {% endif %}
+            </td>
+            <td>{{ product.product.remark }}</td>
+            <td>{{ product.status_string }}</td>
+            <td>¥ {{ product.price }}</td>
+            <td>{{ product.quantity }}</td>
+            <td class="golden last-td">¥ {{ product.total }}</td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td>商品总额</td>
+        <td colspan="50" style="text-align: right">¥ {{ orderInfo.product_fee }}</td>
+    </tr>
+    <tr>
+        <td colspan="50" style="text-align: right">运费：¥ {{ orderInfo.express_fee }}；订单总额：¥ {{ orderInfo.total_fee }}</td>
+    </tr>
+    </tbody>
+</table>

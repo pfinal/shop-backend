@@ -1,0 +1,169 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}订单管理{% endblock %}
+{% set leftMenuActive='Order' %}
+{% block contentRight %}
+<div id="show-send" >
+    <blockquote>
+
+        <div class="nav-tabs bg-success btn-lg">
+            <div class="navbar-left" style="cursor: move; display: block;">
+                订单发货
+            </div>
+            <div class="navbar-right">
+                <a class="aui_close" href="javascript:window.show.close();">
+                    <span class="glyphicon glyphicon-remove-circle"></span>
+                </a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+        <h3 class="lineD">商品信息：</h3>
+        <table class="table mt15" id="attr_values">
+            <tbody>
+            <tr>
+                <td width="40"></td>
+                <td width="120">货号</td>
+                <td>商品名</td>
+                <td>规格</td>
+                <td width="60">价格</td>
+                <td width="40">数量</td>
+                <td width="60">商品促销</td>
+                <td width="60">小计</td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="/TinyShopV2.4_data/data/uploads/2014/05/04/19579466f48282ec37548040b0c69bb3.jpg__100_100.jpg" width="40">
+                </td>
+                <td>MS20140504120_1</td>
+                <td>时尚潮流 牛仔衬衫 男 长袖韩版时尚复古磨白衬衫男春夏外套包邮</td>
+                <td>
+                    颜色:蓝色				　			　尺码:38								</td>
+                <td>58.00</td>
+                <td>1</td>
+                <td></td>
+                <td class="golden">58.00</td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <form action="" method="post">
+            <h3 class="lineD mt10">发货信息</h3>
+            <table class="table mt15">
+                <tbody>
+                <tr>
+                    <th width="100">订单编号：</th>
+                    <td>20161219204645939300
+                        <input type="hidden" name="order_no" value="20161219204645939300">
+                        <input type="hidden" name="order_id" value="7">
+                        <input type="hidden" name="delivery_status" value="0">
+                    </td>
+                    <th width="100">下单时间：</th>
+                    <td>2016-12-19 20:46:45</td>
+                </tr>
+                <tr>
+                    <th>支付方式：</th>
+                    <td  width="120">预存款支付</td>
+                    <th>配送费用：</th>
+                    <td class="golden">10.00</td>
+                </tr>
+                <tr>
+                    <th>
+                        <b class="red">*</b>
+                        物流公司：</th>
+                    <td class="golden">
+                        <select name="express_company_id" inform="0">
+                            <option value="1">中国邮政</option>
+                            <option value="2">申通快递</option>
+                            <option value="3">天天快递</option>
+                            <option value="4">圆通速递</option>
+                            <option value="5">顺丰速运</option>
+                            <option value="6">韵达快递</option>
+                            <option value="7">中通速递</option>
+                            <option value="8">龙邦物流</option>
+                            <option value="9">宅急送</option>
+                            <option value="10">全一快递</option>
+                            <option value="11">汇通速递</option>
+                            <option value="12">民航快递</option>
+                            <option value="13">亚风速递</option>
+                            <option value="14">快捷速递</option>
+                            <option value="15">DDS快递</option>
+                            <option value="16">华宇物流</option>
+                            <option value="17">中铁快运</option>
+                            <option value="18">FedEx</option>
+                            <option value="19">UPS</option>
+                            <option value="20">DHL</option>
+                        </select>
+                    </td>
+                    <th  width="140"><b class="red">*</b>物流单号：</th>
+                    <td class="">
+                        <input pattern="required" type="text" name="express_no" inform="0"></td>
+                </tr>
+                <tr>
+                    <th width="140">
+                        <b class="red">*</b>
+                        收货人姓名：</th>
+                    <td class="">
+                        <input pattern="required" type="text" name="accept_name" value="张三" inform="0">
+                    </td>
+                    <th width="140">
+                        <b class="red">*</b>
+                        联系手机：</th>
+                    <td>
+                        <input pattern="mobi" type="text" name="mobile" value="13131313131" inform="0">
+                    </td>
+                </tr>
+                <tr>
+                    <th  width="100">联系电话：</th>
+                    <td class="">
+                        <input type="text" name="phone" value="" inform="0">
+                    </td>
+                    <th>邮编：</th>
+                    <td>
+                        <input type="text" name="zip" value="422100" inform="0">
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <b class="red">*</b>收货地区：</th>
+                    <td colspan="3">
+                        <select id="province" name="province" inform="0">
+                            <option value="0">==省份/直辖市==</option>
+                        </select>
+                        <select id="city" name="city" inform="0">
+                            <option value="0">==市==</option>
+                        </select>
+                        <select id="county" name="county" inform="0">
+                            <option value="0">==县/区==</option>
+                        </select>
+                        <input pattern="^\d+,\d+,\d+$" id="area" type="text" style="visibility:hidden;width:0;"
+                               value="430000,430100,430104" alt="请选择完整地区信息！" inform="0">
+                        <label></label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <b class="red">*</b>收货地址：</th>
+                    <td colspan="3">
+                        <input pattern="required" type="text" name="addr" value="湖南涉外经济学院" inform="0">
+                    </td>
+                </tr>
+                <tr>
+                    <th>用户备注：</th>
+                    <td colspan="3"></td>
+                </tr>
+                <tr>
+                    <th >发货单备注：</th>
+                    <td colspan="3" class="">
+                        <textarea name="remark" inform="0"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="panel-footer">
+                <button class="btn btn-primary" style="margin-left: 380px;">发 货</button>
+            </div>
+        </form>
+    </blockquote>
+</div>
+{% endblock %}

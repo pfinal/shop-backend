@@ -1,0 +1,31 @@
+<input type="hidden" name="_token" value="{{ csrf_token()}}">
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-title">标题</label>
+    <div class="col-sm-8">
+        <input type="text" name="Push[title]" class="form-control"
+               value="{{ app.request.get('Push').title|default(entity.title) }}" id="input-title" >
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-content">内容</label>
+    <div class="col-sm-8">
+
+        <textarea class="form-control" name="Push[content]" id="input-content" cols="30" rows="5">{{ app.request.get('Push').content|default(entity.content) }}</textarea>
+
+        <span class="help-block"><code>{"message":"新品上架，快去看看吧","route":{"path":"/detail","query":{"skuId":1601}}}</code></span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-cid">cid</label>
+    <div class="col-sm-8">
+
+        <textarea class="form-control" name="Push[cid]" id="input-cid" cols="30" rows="5">{{ app.request.get('Push').cid|default(entity.cid) }}</textarea>
+        <span class="help-block"><code>一行一个, 为空时，发给所有用户</code></span>
+    </div>
+</div>

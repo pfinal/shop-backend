@@ -1,0 +1,131 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class=""><a href="{{ url('admin/product/update',{'id': productId}) }}">修改商品</a></li>
+            <li class=""><a href="{{ url('admin/timelimit/update',{'productId': productId}) }}">限时秒杀</a></li>
+            <li class="active"><a href="{{ url('admin/bulk/update',{'productId': productId}) }}">团购</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                <div class="ui-tips bg-info">
+                    <span class="icon glyphicon glyphicon-info-sign"></span>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form class="form-horizontal mt15 js-form" onsubmit="return false" method="post">
+
+                    <input type="hidden" name="productId" value="{{ productId }}">
+
+                    {{ include('@AdminBundle/bulk/_form.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary js-submit">保存</button>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="mt15"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('static/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}">
+
+    <style>
+        .css-bulk-div {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    {#日历插件#}
+    <script src="{{ asset('static/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}"></script>
+    <script src="{{ asset('static/bootstrap-datetimepicker/js/bootstrap-datetimepicker.zh-CN.js') }}"></script>
+
+    <script>
+
+        $(function() {
+
+            // 检测是开启还是关闭
+
+            //控件初始化
+            $('.js-date').datetimepicker({
+                language: 'zh-CN',
+                weekStart: 0,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 2
+            });
+
+            // 根据团购选择进行展示数据
+            showBulkDiv();
+
+        })
+
+        // 保存
+        $(".js-submit").click(function () {
+            var data = $(".js-form").serialize();
+
+            var loading = leaf.loading().start();
+            $.ajax({
+                type: "POST",
+                url: "{{ url('admin/bulk/save') }}",
+                data: data,
+                dataType: "json",
+                success: function (result) {
+                    loading.stop();
+                    if (result.status) {
+                        leaf.toast("保存成功");
+                    } else {
+                        leaf.alert(result.data);
+                    }
+                },
+                error: function (xmlHttpRequest, textStatus, errorThrown) {
+                    loading.stop();
+                    leaf.alert('网络系统错误');
+                }
+            });
+        });
+
+        // 团购的单选框
+        $(".js-bulk-select input").change(function () {
+            showBulkDiv()
+        });
+
+        // 根据是否为团购进行判断是否展示
+        function showBulkDiv() {
+            var value = $(".js-bulk-select input:checked").val();
+
+            if(value == '{{ constant('AdminBundle\\Controller\\BulkController::BULK_NO') }}') {
+                $(".js-bulk-div").css('display', 'none');
+                return;
+            }
+
+            $(".js-bulk-div").css('display',' block')
+        }
+
+    </script>
+{% endblock %}
+

@@ -1,0 +1,69 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品评论管理{% endblock %}
+{% set leftMenuActive='Comment' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品评论管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">商品评论列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-left" href="javascript:history.back(-1)">返回</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>订单编号</th>
+                                <th>商品</th>
+                                <th>会员昵称</th>
+                                <th>会员手机号</th>
+                                <th>评分</th>
+                                <th>内容</th>
+                                <th>时间</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                {% set orderInfo = item.orderInfo() %}
+                                {% set userInfo = item.userInfo() %}
+                                {% set productInfo = item.productInfo() %}
+                                <tr>
+                                    <td>{{ orderInfo.number }}</td>
+                                    <td>{{ productInfo.name }}</td>
+                                    <td>{{ userInfo.nickname }}</td>
+                                    <td>{{ userInfo.mobile }}</td>
+                                    <td>{{ item.score }}</td>
+                                    <td>{{ item.content }}</td>
+                                    <td>{{ item.created_at }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

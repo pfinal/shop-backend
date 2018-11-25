@@ -1,0 +1,19 @@
+<div class="css-express-region-show-div js-express-region-show-div">
+
+    <div class="region-content">
+
+        <div class="region-content-label">选择区域</div>
+
+        <div class="region-content-item">
+            {% autoescape false %}
+                {{ app.html.checkBoxList('RegionIds', '' , regionList,{'labelOptions':{'class':'checkbox-inline region-checkbox js-region-checkbox'}}) }}
+            {% endautoescape %}
+        </div>
+
+    </div>
+
+    <div class="region-footer">
+        <button class="btn btn-primary js-region-submit">保存</button>
+    </div>
+
+</div>

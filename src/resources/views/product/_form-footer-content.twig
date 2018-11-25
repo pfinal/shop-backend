@@ -1,0 +1,35 @@
+<!-- 商品图文详情 -->
+<div class="form-group">
+
+    <label for="" class="col-sm-2 control-label">图文详情</label>
+
+    <div class="col-sm-8">
+
+        <div class="show-images js-show-content-images">
+
+            {% if contentList is defined %}
+                {% for contentImg in contentList %}
+                    <div class="img-item">
+                        <img src="{{ contentImg.getUrl() }}" width="150" data-content-img-id="{{ contentImg.id }}">
+                        <input type="hidden" name="contentImgIds[]" value="{{ contentImg.id }}">
+                        <span class="js-remove glyphicon glyphicon-remove"></span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        </div>
+
+        <!-- jquery-file-upload 作为目标文件上传插件的文件输入域 -->
+        <div class="btn btn-primary btn-sm fileinput-button" style="margin-top: 10px;">
+            <span>上传...</span><!--选择文件...-->
+            <input class="fileupload" type="file" data-show=".js-show-content-images" name="file[]" multiple>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress progress-striped active js-img-progress" data-show=".js-show-content-images"
+             style="display: none;">
+            <div class="progress-bar progress-bar-info"></div>
+        </div>
+    </div>
+
+</div>

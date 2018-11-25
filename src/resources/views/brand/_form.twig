@@ -1,0 +1,76 @@
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name">名称</label>
+    <div class="col-sm-8">
+        <input type="text" name="Brand[name]" class="form-control"
+               value="{{ app.request.get('Brand').name|default(entity.name) }}" id="input-name">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+{#<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-logo">Logo</label>
+    <div class="col-sm-8">
+        <input type="text" name="Brand[logo]" class="form-control"
+               value="{{ app.request.get('Brand').logo|default(entity.logo) }}" id="input-logo" >
+        <span class="help-block">#}{# 帮助信息 #}{#</span>
+    </div>
+</div>#}
+
+{#  文件上传  #}
+<div class="form-group">
+
+    <label for="" class="col-sm-2 control-label">Logo</label>
+
+    <div class="col-sm-8">
+        <input type="hidden" name="fileKey">
+
+        <div class="show-img">
+            {% if entity.logo is empty %}
+                <img src="{{ asset('images/no-pic.jpg') }}" width="120">
+            {% else %}
+                <img src="{{ entity.logoUrl }}" width="120">
+            {% endif %}
+        </div>
+
+        <span class="btn btn-primary btn-sm fileinput-button" style="margin-top: 10px;">
+            <span>上传...</span>
+            <input class="fileupload" type="file" data-show=".show-img" name="file">
+        </span>
+
+        <!-- 进度条 -->
+        <div id="jquery-file-upload-progress" class="progress progress-striped active"
+             style="display: none;">
+            <div class="progress-bar progress-bar-info"></div>
+        </div>
+    </div>
+
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-description">描述</label>
+    <div class="col-sm-8">
+        <input type="text" name="Brand[description]" class="form-control"
+               value="{{ app.request.get('Brand').description|default(entity.description) }}" id="input-description">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-status">状态</label>
+    <div class="col-sm-8">
+        {% autoescape false %}
+            {{ app.html.dropDownList('Brand[status]',entity.status|default(10),status,{'class':'form-control'}) }}
+        {% endautoescape %}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-sort">排序</label>
+    <div class="col-sm-8">
+        <input type="text" name="Brand[sort]" class="form-control"
+               value="{{ app.request.get('Brand').sort|default(entity.sort) }}" id="input-sort">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+

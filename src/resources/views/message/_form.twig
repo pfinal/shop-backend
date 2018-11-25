@@ -1,0 +1,70 @@
+<input type="hidden" name="_token" value="{{ csrf_token()}}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-type">类型</label>
+    <div class="col-sm-8">
+        {#<input type="text" name="Message[type]" class="form-control"#}
+        {#value="{{ app.request.get('Message').type|default(entity.type) }}" id="input-type" >#}
+
+        {{ app.html.dropDownList('Message[type]', app.request.get('Message').type|default(entity.type), entity.typeAlias(true) ,{'class':'form-control'}) }}
+
+
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-title">标题</label>
+    <div class="col-sm-8">
+        <input type="text" name="Message[title]" class="form-control"
+               value="{{ app.request.get('Message').title|default(entity.title) }}" id="input-title" >
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-route">跳转路由</label>
+    <div class="col-sm-8">
+        <input type="text" name="Message[route]" class="form-control"
+               value="{{ app.request.get('Message').route|default(entity.route) }}" id="input-route" >
+        <span class="help-block">app中的路径，例如<code>{"path":"/ticket"}</code></span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-user_id">会员ID</label>
+    <div class="col-sm-8">
+        <input type="text" name="Message[user_id]" class="form-control"
+               value="{{ app.request.get('Message').user_id|default(entity.user_id) }}" id="input-user_id" >
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-status">状态</label>
+    <div class="col-sm-8">
+        {#<input type="text" name="Message[status]" class="form-control"#}
+               {#value="{{ app.request.get('Message').status|default(entity.status) }}" id="input-status" >#}
+
+
+        {{ app.html.dropDownList('Message[status]', app.request.get('Message').status|default(entity.status), entity.statusAlias(true) ,{'class':'form-control'}) }}
+
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-content">内容</label>
+    <div class="col-sm-8">
+        <textarea name="Message[content]" rows="5" class="form-control"
+                   id="input-content" >{{ app.request.get('Message').content|default(entity.content) }}</textarea>
+        <span class="help-block">文字消息:<code>{"type":"text","content":"恭喜获取新人券一张"}</code><br>图片消息:<code>{"type":"image","content":"http://example.com/1.png"}</code></span>
+    </div>
+</div>
+

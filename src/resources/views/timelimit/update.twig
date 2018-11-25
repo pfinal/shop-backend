@@ -1,0 +1,91 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+
+    <div class="page-title">商品管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class=""><a href="{{ url('admin/product/update',{'id': product.id}) }}">修改商品</a></li>
+            <li class="active"><a href="">限时秒杀</a></li>
+            <li class=""><a href="{{ url('admin/bulk/update',{'productId': product.id}) }}">团购</a></li>
+
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form class="form-horizontal mt15" action="{{ url('admin/timelimit/save',{'productId': product.id}) }}"
+                      method="post">
+
+                    {{ include('@AdminBundle/timelimit/_form.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="js-submit btn btn-primary">保存</button>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="mt15"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            $('.js-date').datetimepicker({
+                language: 'zh-CN',
+                weekStart: 0,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2
+            });
+        })
+    </script>
+
+    <script>
+
+
+        $(function () {
+            showBulkDiv()
+
+        })
+
+        $(".js-status-select input").change(function () {
+            showBulkDiv()
+        });
+
+        // 根据是否为团购进行判断是否展示
+        function showBulkDiv() {
+            var value = $(".js-status-select input:checked").val();
+
+            if (value == '{{ constant('Entity\\Timelimit::STATUS_NO') }}') {
+                $(".js-inputs-div").addClass('hide');
+                return;
+            }
+
+            $(".js-inputs-div").removeClass('hide');
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}订单管理{% endblock %}
+{% set leftMenuActive='Order' %}
+
+{% block stylesheet %}
+    <style>
+        .btn-ul li {
+            float: left;
+            margin-right: 10px;
+        }
+
+        .last-td {
+            border-right: 1px solid #DDDDDD;
+        }
+
+        .golden {
+            text-align: right;
+        }
+    </style>
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">订单管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">订单详情</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div style="margin: 10px 20px;">
+
+                <div class="mt15">
+                    <ul class="btn-ul">
+
+                        <a class="btn btn-default" href="javascript:window.history.go(-1);">返回</a>
+
+                        {% if entity.checkUpdatePrice() %}
+                            <li>
+                                <a class="btn btn-primary"
+                                   href="{{ url('admin/order/update-price', {'id':entity.id}) }}">修改价格</a>
+                            </li>
+                        {% endif %}
+
+
+                        {% if entity.checkConfirm() %}
+                            <li>
+                                <a class="btn btn-primary leaf-confirm"
+                                   href="{{ url('admin/order/confirm', {'id':entity.id}) }}">确认</a>
+                            </li>
+                        {% endif %}
+
+                        {% if entity.checkCancel() %}
+                            <li>
+                                <a class="btn btn-primary leaf-confirm"
+                                   href="{{ url('admin/order/cancel', {'id':entity.id}) }}">作废</a>
+                            </li>
+                        {% endif %}
+
+                        {% if entity.checkDelivery() %}
+                            <li>
+                                <a class="btn btn-primary"
+                                   href="{{ url('admin/order/delivery', {'id':entity.id}) }}">发货</a>
+                            </li>
+                        {% endif %}
+
+                        {% if entity.checkCollection() %}
+                            <li>
+                                <a class="btn btn-primary leaf-confirm"
+                                   href="{{ url('admin/order/collection', {'id':entity.id}) }}">已收款</a>
+                            </li>
+                        {% endif %}
+
+                        {% if entity.checkFinish() %}
+                            <li>
+                                <a class="btn btn-primary leaf-confirm"
+                                   href="{{ url('admin/order/finish', {'id':entity.id}) }}">完成</a>
+                            </li>
+                        {% endif %}
+
+                        <div style="clear: both"></div>
+                    </ul>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                <div class="mt15">订单详情</div>
+                <table class="table mt15">
+
+                    <tr>
+                        <td>订单号</td>
+                        <td>{{ entity.number }}</td>
+                        <td>下单时间</td>
+                        <td>{{ entity.created_at }} {{ entity.getStatus }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>金额</td>
+                        <td>¥ {{ entity.total_fee }} (含运费{{ entity.express_fee }})</td>
+                        <td>款项</td>
+                        <td>{{ entity.getPayType }} {{ entity.getPaymentStatus }}
+
+                            {% if entity.payment_status == constant('Entity\\Order::PAYMENT_STATUS_SUCCESS') %}
+                                (
+                                {% for item in entity.getPaymentList() %}
+                                    <span>{{ item.payTypeAlias() }}{{ item.money }}</span>
+                                {% endfor %}
+                                )
+                            {% endif %}
+
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>收货人</td>
+                        <td>{{ entity.receiver_name }} {{ entity.receiver_phone }} {{ entity.receiver_mobile }}</td>
+                        <td>运输</td>
+                        <td>{{ entity.getDeliveryType }} {{ entity.getDeliveryStatus }} ({{ entity.cityAlias() }})</td>
+                    </tr>
+
+                    <tr>
+                        <td>收货地址</td>
+                        <td colspan="3">{{ entity.getReceiverAllStage|default('') }} {{ entity.receiver_detail }}</td>
+                    </tr>
+
+                    {% if entity.delivery_status != constant('Entity\\Order::DELIVERY_STATUS_NO') %}
+                        <tr>
+                            <td>物流公司</td>
+                            <td>{{ entity.getCarrierName }}</td>
+                            <td>物流单号</td>
+                            <td>{{ entity.number }}</td>
+                        </tr>
+
+                    {% endif %}
+
+
+                    <tr>
+                        <td>发票</td>
+                        <td>{{ entity.getInvoiceType() }} {{ entity.invoice_title }} <span
+                                    style="color:red">{{ entity.invoice_taxpayer_ident }}</span></td>
+
+                        <td>客户留言</td>
+                        <td>{{ entity.message }}</td>
+                    </tr>
+
+                </table>
+
+                <div class="mt15">商品详情</div>
+                <table class="table mt15" id="attr_values">
+                    <tbody>
+                    <tr>
+                        <td>品名</td>
+                        {#<td width="50">SKU</td>#} {# 20181117注释:这里展示sku的ID给用户看是没有意义的(wangmanyuan) #}
+                        <td width="100">货号</td>
+                        <td width="120">简称</td>
+                        <td width="120">SKU条码</td>
+                        <td width="90">规格</td>
+                        <td>备注</td>
+                        <td width="80">价格</td>
+                        <td width="50">数量</td>
+                        <td width="80" class="golden last-td">小计</td>
+                    </tr>
+                    {% for product in productArr %}
+                        <tr>
+                            {#<td></td>#}
+                            <td style="font-size: 12px" skuId="{{ product.sku_id }}">{{ product.product_full_name }}</td>
+                            <td>{{ product.product.code|default('-')}}</td>
+                            <td>{{ product.product.name_short|default('-') }}</td>
+                            <td>{{ product.sku_code }}</td>
+                            <td>
+                                {% if product.color is not empty %}
+                                    {{ product.color }}
+                                {% endif %}
+                                {% if product.size is not empty %}
+                                    {{ product.size }}
+                                {% endif %}
+                                {% if product.version is not empty %}
+                                    {{ product.version }}
+                                {% endif %}
+                            </td>
+                            <td>{{ product.product.remark }}</td>
+                            <td>¥ {{ product.price }}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td class="golden last-td">¥ {{ product.total }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>商品总额</td>
+                        <td class="last-td" colspan="50" style="text-align: right">¥ {{ entity.product_fee }}</td>
+                    </tr>
+                    <tr>
+                        <td class="last-td" colspan="50" style="text-align: right">运费：¥ {{ entity.express_fee }}；订单总额：¥ {{ entity.total_fee }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

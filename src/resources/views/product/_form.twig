@@ -1,0 +1,295 @@
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-category_id">分类</label>
+    <div class="col-sm-8">
+        <select name="Product[category_id]" id="" class="form-control js-category-select">
+            {% for category in categoryList %}
+                <option value="{{ category.id }}" {% if category.id==entity.category_id|default(1) or
+                    category.id==app.request.get('Product').category_id|default(entity.category_id) %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-brand_id">品牌</label>
+    <div class="col-sm-8">
+        {{ app.html.dropDownList('Product[brand_id]',entity.brand_id|default(1),brandList,{'class':'form-control'}) }}
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name">名称</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[name]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').name|default(entity.name) }}" id="input-name">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name_short">简称</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[name_short]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').name_short|default(entity.name_short) }}" id="input-name_short">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-name_short">货号</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[code]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').code|default(entity.code) }}" id="input-code">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">运费模板</label>
+    <div class="col-sm-8">
+        {{ app.html.dropDownList('Product[express_id]',entity.express_id|default(entity.userExpress().id),expressList,{'class':'form-control'}) }}
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-promotion">促销</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[promotion]" class="form-control"
+               value="{{ app.request.get('Product').promotion|default(entity.promotion) }}" id="input-promotion">
+        <span class="help-block">如：包邮</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-parameter">参数</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[parameter]" class="form-control"
+               value="{{ app.request.get('Product').parameter|default(entity.parameter) }}" id="input-parameter">
+        <span class="help-block">如：【保质期】2017/10/28生产-2018/10/27到期</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-basic_sale_num">基础销量</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[basic_sale_num]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').basic_sale_num|default(entity.basic_sale_num) }}" id="input-basic_sale_num">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-buy_num">限购</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[buy_num]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').buy_num|default(entity.buy_num) }}" id="input-buy_num">
+        <span class="help-block">值为"0"时，表示不限购</span>
+    </div>
+</div>
+
+<style>
+    .show-images img {
+        margin: 3px;
+    }
+
+    .img-item {
+        display: inline-block;
+        position: relative;
+    }
+
+    .js-remove {
+        position: absolute;
+        right: -2px;
+        top: -2px;
+        padding: 2px;
+        background: #fff;
+        border-radius: 100%;
+        cursor: pointer;
+    }
+</style>
+
+{#  文件上传  #}
+<div class="form-group">
+
+    <label for="" class="col-sm-2 control-label">主图</label>
+
+    <div class="col-sm-8">
+        <input type="hidden" name="fileKey">
+
+        <div class="show-cover">
+
+            {% if coverImage is defined and coverImage is not empty %}
+                <img src="{{ coverImage.getUrl() }}" width="120">
+
+            {% else %}
+                <img src="{{ asset('images/no-pic.jpg') }}" width="120">
+            {% endif %}
+        </div>
+
+        <span class="btn btn-primary btn-sm fileinput-button" style="margin-top: 10px;">
+            <span>上传...</span>
+            <input class="fileupload" type="file" data-show=".show-cover" name="file">
+        </span>
+
+        <!-- 进度条 -->
+        <div class="progress progress-striped active js-img-progress" data-show=".show-cover"
+             style="display: none;">
+            <div class="progress-bar progress-bar-info"></div>
+        </div>
+    </div>
+
+</div>
+
+
+{#  文件上传  #}
+<div class="form-group">
+
+    <label for="" class="col-sm-2 control-label">细节图片</label>
+
+    <div class="col-sm-8">
+
+        <div class="show-images js-product-image-show">
+
+            {% if imageList is defined %}
+                {% for image in imageList %}
+                    <div class="img-item">
+                        <img src="{{ image.getUrl() }}" height="90" data-image-id="{{ image.id }}">
+                        <input type="hidden" name="imageIds[]" value="{{ image.id }}">
+                        <span class="js-remove glyphicon glyphicon-remove"></span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        </div>
+
+        <!-- jquery-file-upload 作为目标文件上传插件的文件输入域 -->
+        <div class="btn btn-primary btn-sm fileinput-button" style="margin-top: 10px;">
+            <span>上传...</span><!--选择文件...-->
+            <input class="fileupload" type="file" data-show=".js-product-image-show" name="file[]" multiple>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress progress-striped active js-img-progress" data-show=".js-product-image-show"
+             style="display: none;">
+            <div class="progress-bar progress-bar-info"></div>
+        </div>
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="{{ asset('static/jquery-file-upload/css/jquery.fileupload.css') }}">
+
+<div class="form-group hide">
+    <label class="col-sm-2 control-label" for="input-price">参考价</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[price]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').price|default(entity.price) }}" id="input-price">
+        <span class="help-block"></span>
+    </div>
+</div>
+
+<div class="form-group {% if contentShow == 1 %}{% else %}hide{% endif %}" style="">
+    <label class="col-sm-2 control-label" for="input-description">详细介绍</label>
+    <div class="col-sm-8">
+        <textarea name="Product[content]" id="input-description"
+                  style="width: 100%;height: 400px;">{{ app.request.get('Product').content|default(entity.content) }}</textarea>
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-status">状态</label>
+    <div class="col-sm-8">
+        {{ app.html.dropDownList('Product[status]',entity.status|default(10),status,{'class':'form-control'}) }}
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-sort">排序</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[sort]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').sort|default(entity.sort) }}" id="input-sort">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-online_at">上架时间</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[online_at]" id="input-online_at" autocomplete="off"
+               value="{{ app.request.get('Product').online_at|default(entity.online_at) }}"
+               class="form-control input-sm js-date"
+               data-date=""
+               data-date-format="yyyy-mm-dd hh:ii:00"
+        />
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-offline_at">下架时间</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[offline_at]" id="input-online_at" autocomplete="off"
+               value="{{ app.request.get('Product').offline_at|default(entity.offline_at) }}"
+               class="form-control input-sm js-date"
+               data-date=""
+               data-date-format="yyyy-mm-dd hh:ii:00"
+        />
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-remark">备注(会员不可见)</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[remark]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').remark|default(entity.remark) }}" id="input-remark">
+        <span class="help-block">{# 帮助信息 #}</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="input-sell_point">卖点</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[sell_point]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').sell_point|default(entity.sell_point) }}" id="input-sell_point">
+        <span class="help-block">如：健康 或者 爆款</span>
+    </div>
+</div>
+
+<!-- 单属性设置 -->
+<div class="form-group hide js-one-sku">
+    <label class="col-sm-2 control-label" for="input-price">数量</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[sku][quantity]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').sku.quantity|default((sku is defined and sku)?sku.quantity:'0') }}"
+               id="input-price">
+        <span class="help-block"></span>
+    </div>
+</div>
+<div class="form-group hide js-one-sku">
+    <label class="col-sm-2 control-label" for="input-price">原价</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[sku][original_price]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').sku.original_price|default((sku is defined and sku)?sku.original_price:'0') }}"
+               id="input-price">
+        <span class="help-block"></span>
+    </div>
+</div>
+<div class="form-group hide js-one-sku">
+    <label class="col-sm-2 control-label" for="input-price">价格</label>
+    <div class="col-sm-8">
+        <input type="text" name="Product[sku][price]" class="form-control" autocomplete="off"
+               value="{{ app.request.get('Product').sku.price|default((sku is defined and sku)?sku.price:'') }}" id="input-price">
+        <span class="help-block"></span>
+    </div>
+</div>
+
+
+

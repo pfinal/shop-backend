@@ -1,0 +1,50 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}店铺装修{% endblock %}
+{% set leftMenuActive='Home' %}
+
+{% block contentRight %}
+
+    <div class="page-title">店铺装修</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">配置项</a></li>
+            <li><a href="{{ url('admin/home-module') }}">模块</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 列表 #}
+                <div class="table-responsive mt15">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in tagList %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>
+                                    <a href="{{ url('admin/home-item', {'tag':item.tag}) }}">管理</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

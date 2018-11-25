@@ -1,0 +1,105 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}消息管理{% endblock %}
+{% set leftMenuActive='Message' %}
+
+{% block contentRight %}
+
+    <div class="page-title">消息管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">消息列表</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/message/create') }}"><span class="glyphicon glyphicon-plus"></span> 新增消息</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/message') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Message[id]" class="form-control"
+                               value="{{ app.request.get('Message').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>会员ID</label>
+                        <input type="text" name="Message[user_id]" class="form-control"
+                               value="{{ app.request.get('Message').user_id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>类型</label>
+                        <input type="text" name="Message[type]" class="form-control"
+                               value="{{ app.request.get('Message').type|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Message') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/message') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 列表 #}
+                {% if dataProvider.data is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive mt15">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>会员ID</th>
+                                    <th>类型</th>
+                                    <th>状态</th>
+                                    <th>跳转路由</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in dataProvider.data %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.user_id }}</td>
+                                    <td>{{ item.typeAlias }}</td>
+                                    <td>{{ item.statusAlias }}</td>
+                                    <td>{{ item.route }}</td>
+                                    <td>
+                                        {#<a href="{{ url('admin/message/view', {'id':item.id}) }}">详情</a>#}
+                                        <a href="{{ url('admin/message/update', {'id':item.id}) }}">修改</a>
+                                        <a href="{{ url('admin/message/delete', {'id':item.id, _token:csrf_token() }) }}" class="leaf-confirm" data-method="post" data-dialog-content="您确定要删除吗?">删除</a>
+                                    </td>
+                                </tr>
+                        {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ dataProvider.page.itemCount }} </strong>条记录 </span>
+                    {{ dataProvider.page.createLinks(url('admin/message')) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}运费模板{% endblock %}
+{% set leftMenuActive='Express' %}
+
+{% block css %}
+    <link href="{{ asset('themes/css/express.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block contentRight %}
+
+    <div class="page-title">运费模板</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="">新增运费模板</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form action="{{ url('admin/express/create') }}" method="post" class="form-horizontal mt15 my-form">
+
+                    {{ include('@AdminBundle/express/_form.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="button" class="btn btn-primary js-submit btn-disabled">提交</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 选择地址 -->
+    {% include '@AdminBundle/express/_region.twig' %}
+
+{% endblock %}
+
+{% block js %}
+    {% include '@AdminBundle/express/_js.twig' %}
+{% endblock %}

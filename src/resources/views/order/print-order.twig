@@ -1,0 +1,85 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}购物单{% endblock %}
+{% set leftMenuActive='Order' %}
+
+{% block body %}
+
+    <div class="panel col-md-12">
+
+        <table class="table mt15">
+            <tr>
+                <td ><img src="" /></td>
+                <td valign="bottom" align="right" width="240">
+                    <p>客户：{{ entity.getUserName.username }} &nbsp;&nbsp;<span class="ml_20">电话：{{ entity.getUserName.mobile }}</span></p>
+                </td>
+            </tr>
+        </table>
+        <table class="table">
+            <tr>
+                <td><b>订单号：</b>{{ entity.out_trade_no }}</td>
+                <td align="right" width="240px"><b>订购日期：</b>{{ entity.created_at }}</td>
+            </tr>
+
+        </table>
+        <table class="table mt15">
+            <tr>
+                <th width="40">序号</th>
+                <th width="100">商品货号</th>
+                <th width="200">商品名称</th>
+                <th width="200">规格</th>
+                <th  width="80">单价</th>
+                <th  width="60">数量</th>
+                <th width="80">小计</th>
+            </tr>
+            <tr>
+                <td>{{ entity.id }}</td>
+                <td>{{ entity.out_trade_no~entity.id }}</td>
+                <td> {{ entity.name }}</td>
+                <td>
+                    {% if entity.color is not empty %}
+                        颜色:{{ entity.color }}
+                    {% endif %}
+                    {% if entity.size is not empty %}
+                        尺码:{{ entity.size }}
+                    {% endif %}
+                    {% if entity.version is not empty %}
+                        版本:{{ entity.version }}
+                    {% endif %}
+                </td>
+                <td> {{ entity.price }} </td>
+                <td> {{ entity.quantity }}</td>
+                <td class="golden"> {{ entity.total }}</td>
+            </tr>
+
+        </table>
+        <table class="table">
+            <tr>
+                <td>订单附言：{{ entity.message }}</td>
+                <td width="300">
+                    <ul>
+                        <li><span class="caption">商品价格：</span>{{ entity.total_fee }} </li>
+                        <li><span class="caption">配送费用：</span>{{ entity.express_fee }} </li>
+                        <li><span class="caption">支付手续费：</span> 0.00</li>
+                        <li><span class="caption">订单优惠：</span>-  0.00</li>
+
+                        <li><span class="caption">代金券：</span>- 0.00 </li>
+
+                        <li><b><span class="caption">应付总金额：</span>  {{ entity.total_fee }} </b></li>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+
+        <table class="table">
+            <tr><td align="left">收货人：{{ entity.receiver_name }} </td><td align="right">地址：{{ entity.receiver_all_stage }} {{ entity.receiver_detail }} </td></tr>
+            <tr><td>电话：{{ entity.receiver_mobile }} </td><td align="right">配送方式：{{ entity.getDeliveryType }} </td></tr>
+        </table>
+        <table class="table">
+            <tr>
+                <td align="left"><img src=""/></td>
+                <td align="right">利得来商城</td>
+            </tr>
+        </table>
+        <div align="center"><input class="button" type="submit" onclick="window.print();" value="打印" /></div>
+    </div>
+{% endblock %}

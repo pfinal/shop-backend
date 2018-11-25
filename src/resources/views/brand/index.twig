@@ -1,0 +1,102 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}品牌管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+    <div class="page-title">商品管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class=""><a href="{{ url('admin/product') }}">商品列表</a></li>
+            <li class=""><a href="{{ url('admin/category') }}">分类管理</a></li>
+            <li class="active"><a href="{{ url('admin/brand') }}">品牌管理</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid content-main">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="mt15">
+                    <a class="btn btn-sm btn-primary pull-right" href="{{ url('admin/brand/create') }}"><span class="glyphicon glyphicon-plus"></span> 新增品牌</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 搜索表单 #}
+                {#<form action="{{ url('admin/brand') }}" method="get" class="form-inline form-search mt15">
+                    <div class="form-group">
+                        <label>Id</label>
+                        <input type="text" name="Brand[id]" class="form-control"
+                               value="{{ app.request.get('Brand').id|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="Brand[name]" class="form-control"
+                               value="{{ app.request.get('Brand').name|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Logo</label>
+                        <input type="text" name="Brand[logo]" class="form-control"
+                               value="{{ app.request.get('Brand').logo|default('') }}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-search"></span> 搜索
+                    </button>
+
+                    {% if app.request.get('Brand') %}
+                        <a class="btn btn-default btn-sm" href="{{ url('admin/brand') }}">
+                            <span class="glyphicon glyphicon-repeat"></span> 清空条件</a>
+                    {% endif %}
+
+                </form>#}
+
+                {# 用户列表 #}
+                {% if list is empty %}
+                    <div class="alert alert-warning mt15" role="alert">暂无信息</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mt15">
+                            <thead>
+                                <tr>
+                                    {#<th>ID</th>#}
+                                    <th>名称</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in list %}
+                                <tr>
+                                   {# <td>{{ item.id }}</td>#}
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.getStatusName }}</td>
+                                    <td>
+                                        {#<a href="{{ url('admin/brand/view', {'id':item.id}) }}">详情</a>#}
+                                        <a href="{{ url('admin/brand/update', {'id':item.id}) }}">修改</a>
+                                        <a href="{{ url('admin/brand/delete', {'id':item.id}) }}" class="leaf-confirm">删除</a>
+                                    </td>
+                                </tr>
+                        {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# 分页 #}
+                <div class="pull-right">
+                    <span>共<strong> {{ page.itemCount }} </strong>条记录 </span>
+                    {{ page.createLinks(url('admin/brand'))|raw }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

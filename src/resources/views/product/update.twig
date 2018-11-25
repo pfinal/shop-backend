@@ -1,0 +1,575 @@
+{% extends '@AdminBundle/layout.twig' %}
+{% block title %}商品管理{% endblock %}
+{% set leftMenuActive='Product' %}
+
+{% block contentRight %}
+
+
+    <div class="page-title">商品管理</div>
+
+    <div class="content-top">
+        <ul class="top-nav">
+            <li class="active"><a href="{{ url('admin/product/update',{'id': entity.id}) }}">修改商品</a></li>
+            <li class=""><a href="{{ url('admin/timelimit/update',{'productId': entity.id}) }}">限时秒杀</a></li>
+            <li class=""><a href="{{ url('admin/bulk/update',{'productId': entity.id}) }}">团购</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+                {# 一次性消息提示 #}
+                {% include 'message.twig' %}
+
+                {# 错误提示信息 #}
+                {% if error is defined and error is not empty %}
+                    <div class="ui-tips bg-info">
+                        <span class="icon glyphicon glyphicon-info-sign"></span>
+                        <span>{{ error }}</span>
+                    </div>
+                {% endif %}
+
+                {# 表单 #}
+                <form class="form-horizontal mt15" action="{{ url('admin/product/update',{'id': entity.id}) }}"
+                      method="post">
+
+                    {{ include('@AdminBundle/product/_form.twig') }}
+
+                    <script src="{{ asset('static/art-template/template-native.js') }}"></script>
+                    <script id="sku-update" type="text/html">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-brand_id">属性</label>
+                            <div class="col-sm-8">
+                                <% if(showMinus.length==0) { %>
+                                {% for key,property in propertyList %}
+                                    <div class="js-parent" style="position: relative">
+                                        <div style="position: absolute;left: 50px;top: -5px" class="hidden js-create">
+                                            <input type="text" value="" class="js-create-input"
+                                                   js-data-property="{{ key }}">
+                                            <span class="btn btn-info js-create-button"
+                                                  style="cursor: pointer">添加</span>
+                                        </div>
+                                        <h5>{{ property }}:<span class="glyphicon glyphicon-plus js-plus"></span></h5>
+                                        {% if propertyInfo[key] is defined %}
+                                            {% for key1,info in propertyInfo[key] %}
+                                                {% if info is not empty %}
+                                                    <span style='position: relative' class='js-minus-parent'>
+                                                                <span class="js-copy">
+                                                                    <input type='text' class='left-top'
+                                                                           value='{{ info }}'
+                                                                           js-data-name='{{ key }}' disabled=true>
+                                                                    <span class='glyphicon glyphicon-minus hidden js-minus'
+                                                                          style='position: absolute;right: 5px;cursor: pointer'></span>
+                                                                </span>
+                                                        </span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                                <% }else{ %>
+
+                                {% for key,property in propertyList if key == 'color' %}
+                                    <div class="js-parent" style="position: relative">
+
+                                        <div style="position: absolute;left: 50px;top: -5px" class="hidden js-create">
+                                            <input type="text" value="" class="js-create-input"
+                                                   js-data-property="color">
+                                            <span class="btn btn-info js-create-button"
+                                                  style="cursor: pointer">添加</span>
+                                        </div>
+                                        <h5>{{ property }}:<span class="glyphicon glyphicon-plus js-plus"></span></h5>
+
+                                        <% if(showMinus['color'].length>0) { %>
+                                        <% for(i = 0; i < showMinus['color'].length; i++) { %>
+                                        <span style='position: relative' class='js-minus-parent'>
+                                                             <span class="js-copy">
+                                                              <input type='text' class='left-top'
+                                                                     value="<%=showMinus['color'][i]%>"
+                                                                     js-data-name='color'
+                                                                     disabled=true>
+                                                             <span class='glyphicon glyphicon-minus hidden js-minus'
+                                                                   style='position: absolute;right: 5px;cursor: pointer'></span>
+                                                                </span>
+                                                             </span>
+                                        <% } %>
+                                        <% } %>
+                                    </div>
+                                {% endfor %}
+
+                                {% for key,property in propertyList if key == 'size' %}
+                                    <div class="js-parent" style="position: relative">
+                                        <div style="position: absolute;left: 50px;top: -5px" class="hidden js-create">
+                                            <input type="text" value="" class="js-create-input" js-data-property="size">
+                                            <span class="btn btn-info js-create-button"
+                                                  style="cursor: pointer">添加</span>
+                                        </div>
+                                        <h5>{{ property }}:<span class="glyphicon glyphicon-plus js-plus"></span></h5>
+                                        <% if(showMinus['size'].length>0) { %>
+                                        <% for(i = 0; i < showMinus['size'].length; i++) { %>
+                                        <span style='position: relative' class='js-minus-parent'>
+                                                         <span class="js-copy">
+                                                          <input type='text' class='left-top'
+                                                                 value="<%=showMinus['size'][i]%>" js-data-name='size'
+                                                                 disabled=true>
+                                                         <span class='glyphicon glyphicon-minus hidden js-minus'
+                                                               style='position: absolute;right: 5px;cursor: pointer'></span>
+                                                            </span>
+                                                         </span>
+                                        <% } %>
+                                        <% } %>
+                                    </div>
+                                {% endfor %}
+
+                                {% for key,property in propertyList if key == 'version' %}
+                                    <div class="js-parent" style="position: relative">
+                                        <div style="position: absolute;left: 50px;top: -5px" class="hidden js-create">
+                                            <input type="text" value="" class="js-create-input"
+                                                   js-data-property="version">
+                                            <span class="btn btn-info js-create-button"
+                                                  style="cursor: pointer">添加</span>
+                                        </div>
+                                        <h5>{{ property }}:<span class="glyphicon glyphicon-plus js-plus"></span></h5>
+                                        <% if(showMinus['version'].length>0) { %>
+                                        <% for(i = 0; i < showMinus['version'].length; i++) { %>
+                                        <span style='position: relative' class='js-minus-parent'>
+                                                         <span class="js-copy">
+                                                          <input type='text' class='left-top'
+                                                                 value="<%=showMinus['version'][i]%>"
+                                                                 js-data-name='version'
+                                                                 disabled=true>
+                                                         <span class='glyphicon glyphicon-minus hidden js-minus'
+                                                               style='position: absolute;right: 5px;cursor: pointer'></span>
+                                                            </span>
+                                                         </span>
+                                        <% } %>
+                                        <% } %>
+                                    </div>
+                                {% endfor %}
+                                <% } %>
+
+                                <div class="js-sku" style="margin-top: 30px">
+                                    <table class="table">
+                                        <tr>
+                                            <th><span class="form-control">属性组合</span></th>
+                                            <th><span class="form-control quantity-form-input">库存</span></th>
+                                            <th><span class="form-control code-form-input">条形码</span></th>
+                                            <th><span class="form-control price-form-input">原价</span></th>
+                                            <th><span class="form-control price-form-input">现价</span></th>
+                                        </tr>
+                                        <% if(skuList.length==0) { %>
+                                        {% for key,sku in skuList %}
+                                            <tr class='js-select'>
+
+                                                <td><span class="form-control js-first">{{ sku.getSkuInfo.show }}</span>
+                                                </td>
+                                                <td><input type='text'
+                                                           class='left-top form-control quantity-form-input js-sku-quantity'
+                                                           name='Product[property][{{ key }}][sku]'
+                                                           value='{{ sku.quantity }}'></td>
+                                                <td><input type='text' class='left-top form-control code-form-input'
+                                                           name='Product[property][{{ key }}][code]'
+                                                           value='{{ sku.code }}'></td>
+                                                <td><input type='text'
+                                                           class='left-top form-control price-form-input js-sku-price'
+                                                           name='Product[property][{{ key }}][original_price]'
+                                                           value='{{ sku.original_price }}'></td>
+                                                <td><input type='text'
+                                                           class='left-top form-control price-form-input js-sku-price'
+                                                           name='Product[property][{{ key }}][price]'
+                                                           value='{{ sku.price }}'></td>
+                                                <input type='text'
+                                                       name='Product[property][{{ key }}][name]'
+                                                       class='hidden'
+                                                       value='{{ sku.getSkuInfo.name }}'>
+                                                <input type='text'
+                                                       name='Product[property][{{ key }}][value]'
+                                                       class='hidden'
+                                                       value='{{ sku.getSkuInfo.value }}'>
+
+                                            </tr>
+                                        {% endfor %}
+                                        <% } %>
+                                        {% if propertyList|length > 0 %}
+                                            <% for(i = 0; i < skuList.length; i++) { %>
+                                            <tr class='js-select'>
+                                                <td><span class="form-control js-first"><%=skuList[i]['show']%></span>
+                                                </td>
+                                                <td><input type='text'
+                                                           class='left-top form-control quantity-form-input js-sku-quantity'
+                                                           name='Product[property][<%=i%>][sku]'
+                                                           value="<%=skuList[i]['quantity']%>"></td>
+                                                <td><input type='text' class='left-top form-control code-form-input'
+                                                           name='Product[property][<%=i%>][code]'
+                                                           value="<%=skuList[i]['code']%>"></td>
+                                                <td><input type='text'
+                                                           class='left-top form-control price-form-input js-sku-price'
+                                                           name='Product[property][<%=i%>][original_price]'
+                                                           value="<%=skuList[i]['original_price']%>"></td>
+                                                <td><input type='text'
+                                                           class='left-top form-control price-form-input js-sku-price'
+                                                           name='Product[property][<%=i%>][price]'
+                                                           value="<%=skuList[i]['price']%>"></td>
+                                                <input type='text' name='Product[property][<%=i%>][name]' class='hidden'
+                                                       value="<%=skuList[i]['name']%>">
+                                                <input type='text' name='Product[property][<%=i%>][value]'
+                                                       class='hidden'
+                                                       value="<%=skuList[i]['value']%>">
+                                            </tr>
+                                            <% } %>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </script>
+                    <div id="show-sku-update"></div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">分组</label>
+                        <div class="col-sm-8">
+                            {% autoescape false %}
+                                {{ app.html.checkBoxList('MixIds', app.request.get('MixIds')|default(entity.mixIds()) , mixList,{'labelOptions':{'class':'checkbox-inline','style':'line-height:normal;'}}) }}
+                            {% endautoescape %}
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">标签</label>
+                        <div class="col-sm-8">
+                            {% autoescape false %}
+                                {{ app.html.dropDownList('TagId', entity.tagId()|default(), tagList,{'class':'form-control', 'prompt': '无'}) }}
+                            {% endautoescape %}
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">配送区域</label>
+                        <div class="col-sm-8">
+                            {% autoescape false %}
+                                {{ app.html.checkBoxList('RegionIds', app.request.get('RegionIds')|default(entity.regionIds()) , regionList,{'labelOptions':{'class':'checkbox-inline','style':'line-height:normal;width: 150px;margin-left: 0;'}}) }}
+                            {% endautoescape %}
+                            <span class="help-block">{# 帮助信息 #}</span>
+                        </div>
+                    </div>
+
+                    {{ include('@AdminBundle/product/_form-footer-content.twig') }}
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <button type="submit" class="btn btn-primary js-submit">提交</button>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="mt15"></div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block css %}
+    <style>
+        .price-form-input {
+            width: 100px;
+        }
+
+        .quantity-form-input {
+            width: 100px;
+        }
+
+        .code-form-input {
+            width: 150px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+
+    {% include '@AdminBundle/product/_js.twig' %}
+
+    <script>
+        // 是否展示单属性的设置
+        function checkOneSku() {
+            {% if entity.id > 0 and sku|length > 0 %}
+            $(".js-one-sku").removeClass("hide")
+            {% else %}
+            $(".js-one-sku").addClass("hide")
+            {% endif %}
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            checkOneSku()
+
+            //编辑器id
+            var editorId = 'input-description';
+
+            //实例化编辑器
+            var ue = UE.getEditor(editorId, {
+                serverUrl: "{{ url('ueditor') }}",
+                //initialContent: '欢迎使用ueditor!',  //初始化编辑器的内容,也可以通过textarea/script 给值
+                autoHeightEnabled: true,
+                autoFloatEnabled: true,
+                enableAutoSave: false,
+                saveInterval: 1000 * 60 * 60,
+                iframeCssUrl: '{{ asset('static/ueditor/iframe.css') }}',
+                toolbars: [[
+                    'fullscreen',
+                    'source', 'emotion', 'fontfamily', 'fontsize', 'bold', 'italic', 'underline', 'fontborder', 'strikethrough',
+                    'justifyleft', 'justifyright', 'justifycenter',
+                    'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'pasteplain',
+                    'removeformat', 'formatmatch', 'autotypeset', 'simpleupload',
+                    'undo', 'redo'
+                ]]
+            });
+
+            //初始化完毕同步编辑器内容到textarea中
+            ue.ready(function () {
+                //ue.setContent('欢迎使用ueditor',true); //追加内容到编辑器
+                var content = this.getContent();
+                $("#" + editorId).val(content);
+            });
+
+            //失去焦点时自动同步编辑器内容到textarea中
+            ue.onblur = function () {
+                var content = this.getContent();
+                $("#" + editorId).val(content);
+            };
+
+            //图片上传
+
+            var skuList = [];
+            var showMinus = [];
+            init(skuList, showMinus);
+
+            //加载页面
+            function init(data, showMinus) {
+                var data1 = {
+                    skuList: data,
+                    showMinus: showMinus,
+                };
+                $('#show-sku-update').empty();
+
+                {% if propertyList|length > 0 %}
+                var html = template('sku-update', data1);
+                document.getElementById('show-sku-update').innerHTML = html;
+                {% endif %}
+                //editor();
+            }
+
+
+            $('.js-date').datetimepicker({
+                language: 'zh-CN',
+                weekStart: 0,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2
+            });
+
+            $(document).on('mouseover', '.js-copy', function () {
+                $(this).find('.js-minus').removeClass('hidden');
+            });
+            $(document).on('mouseout', '.js-copy', function () {
+                $(this).find('.js-minus').addClass('hidden');
+            });
+
+            $(document).on('click', '.js-plus', function () {
+                $('.js-plus').not(this).parents('.js-parent').find('.js-create-input').val('');
+                $('.js-plus').not(this).parents('.js-parent').find('.js-create').addClass('hidden')
+                var property = $(this).parents('.js-parent');
+
+                property.find('.js-create').toggleClass('hidden');
+            });
+
+            $(document).on('click', '.js-create-button', function () {
+
+                var property = $(this).parents('.js-parent');
+                var value = property.find('.js-create-input').val();
+                var prop = property.find('.js-create-input').attr('js-data-property');
+                if (value == '') {
+                    leaf.alert('请输入属性名称!');
+                    return false;
+                }
+
+                //获取页面数据（数量，价格等）
+                var arrSelect = [];
+                var arrObj = $('.js-select');
+                for (var y = 0; y < arrObj.length; y++) {
+                    arrSelect[y] = [];
+                    arrSelect[y][0] = $(arrObj[y]).find(".js-first").html();
+                    arrSelect[y][1] = $(arrObj[y]).find("[name='Product[property][" + y + "][sku]']").val();
+                    arrSelect[y][2] = $(arrObj[y]).find("[name='Product[property][" + y + "][code]']").val();
+                    arrSelect[y][3] = $(arrObj[y]).find("[name='Product[property][" + y + "][original_price]']").val();
+                    arrSelect[y][4] = $(arrObj[y]).find("[name='Product[property][" + y + "][price]']").val();
+                }
+                //console.log(arrSelect);
+                var option = "<span style='position: relative' class='js-minus-parent'><span class='js-copy'><input type='text' class='left-top' value='" + value + "' js-data-name='" + prop + "' disabled=true><span class='glyphicon glyphicon-minus hidden js-minus' style='position: absolute;right: 5px;cursor: pointer' ></span></span></span>";
+                $(this).parents('.js-parent').append(option);
+
+                showMinus = [];
+                showMinus['color'] = [];
+                showMinus['size'] = [];
+                showMinus['version'] = [];
+                var inputArr = $('.js-minus-parent input');
+                for (var i = 0; i < inputArr.length; i++) {
+                    showMinus[$(inputArr[i]).attr('js-data-name')][showMinus[$(inputArr[i]).attr('js-data-name')].length] = $(inputArr[i]).val();
+                }
+                showMinus[1] = [1];
+                //console.log(showMinus);
+                curd(arrSelect, showMinus);
+
+            });
+            $(document).on('click', '.js-minus', function () {
+
+                //获取页面数据（数量，价格等）
+                var arrSelect = [];
+                var arrObj = $('.js-select');
+                for (var y = 0; y < arrObj.length; y++) {
+                    arrSelect[y] = [];
+                    arrSelect[y][0] = $(arrObj[y]).find(".js-first").html();
+                    arrSelect[y][1] = $(arrObj[y]).find("[name='Product[property][" + y + "][sku]']").val();
+                    arrSelect[y][2] = $(arrObj[y]).find("[name='Product[property][" + y + "][code]']").val();
+                    arrSelect[y][3] = $(arrObj[y]).find("[name='Product[property][" + y + "][original_price]']").val();
+                    arrSelect[y][4] = $(arrObj[y]).find("[name='Product[property][" + y + "][price]']").val();
+                }
+                if ($(this).parents('.js-minus-parent').siblings('.js-minus-parent').length == 0) {
+                    $(this).parents('.js-minus-parent').remove();
+                    return false;
+                }
+
+                $(this).parents('.js-minus-parent').remove();
+                showMinus = [];
+                showMinus['color'] = [];
+                showMinus['size'] = [];
+                showMinus['version'] = [];
+                var inputArr = $('.js-minus-parent input');
+                for (var i = 0; i < inputArr.length; i++) {
+                    showMinus[$(inputArr[i]).attr('js-data-name')][showMinus[$(inputArr[i]).attr('js-data-name')].length] = $(inputArr[i]).val();
+                }
+                showMinus[1] = [1];
+                curd(arrSelect, showMinus);
+            });
+
+            function curd(arrSelect, showMinus) {
+                skuList = [];
+                var arr = [];
+                var m = 0;
+                {% for key,property in propertyList %}
+                if ($("[js-data-name='{{ key }}']").length > 0) {
+                    arr[m] = $("[js-data-name='{{ key }}']");
+                    m++;
+                }
+                {% endfor %}
+                var i = 0;
+                var k2 = 0;
+                var kkk = [];
+                var count = 0;
+                hei(arr, i);
+
+                function hei(arr, k) {
+                    if (arr.length == 0) {
+                        showMinus = [];
+                        return false;
+                    }
+                    var length = arr[k].length;
+                    for (var j = 0; j < length; j++) {
+                        kkk[k] = j;
+                        if (k < arr.length - 1) {
+                            k2++;
+                            var kk = [];
+                            kk['k' + k2] = k + 1;
+                            hei(arr, kk['k' + k2]);
+                        } else {
+                            k2++;
+                            var abcd = [];
+                            var abcde = [];
+                            var abc1 = '';
+                            for (var val = 0; val < kkk.length; val++) {
+                                var key = $(arr[val][kkk[val]]).attr('js-data-name');
+                                var abc = $(arr[val][kkk[val]]).val();
+                                abcd[val] = key;
+                                abcde[val] = abc;
+                                abc1 = abc1 + abc + '*';
+                            }
+                            var sku = '';
+                            var code = '';
+                            var original_price = '';
+                            var price = '';
+                            var abcd1 = JSON.stringify(abcd);
+                            var abcde1 = JSON.stringify(abcde);
+                            for (var m = 0; m < arrSelect.length; m++) {
+                                if (arrSelect[m][0] == abc1) {
+                                    sku = arrSelect[m][1];
+                                    code = arrSelect[m][2];
+                                    original_price = arrSelect[m][3];
+                                    price = arrSelect[m][4];
+                                }
+                            }
+                            skuList[count] = [];
+                            skuList[count]['show'] = abc1;
+                            skuList[count]['quantity'] = sku;
+                            skuList[count]['code'] = code;
+                            skuList[count]['original_price'] = original_price;
+                            skuList[count]['price'] = price;
+                            skuList[count]['name'] = abcd1;
+                            skuList[count]['value'] = abcde1;
+                            count++;
+                        }
+                    }
+                }
+
+                init(skuList, showMinus);
+            }
+
+            $(document).on('submit', '.form-horizontal', function () {
+                var propertyValidate = $('.js-parent');
+                for (var j = 0; j < propertyValidate.length; j++) {
+                    var countValidate = $(propertyValidate[j]).find('.js-copy');
+                    if (countValidate.length == 0) {
+                        leaf.alert('请添加缺少的属性');
+                        return false;
+                    }
+                }
+
+                var ArrValidate1 = $('.js-select').find('.js-sku-quantity');
+                var ArrValidate2 = $('.js-select').find('.js-sku-price');
+                var res1 = /^[0][.][0-9]{1,2}$/;
+                var res2 = /^[1-9][0-9]{0,10}[.]{0,1}[0-9]{0,2}$/;
+                var res3 = /^0$/;
+                var res4 = /^[0-9]*[1-9][0-9]*$/;
+
+                for (var i = 0; i < ArrValidate1.length; i++) {
+                    if ($(ArrValidate1[i]).val() == '') {
+                        leaf.alert('请补全库存');
+                        return false;
+                    }
+                    if (!res4.test($(ArrValidate1[i]).val()) && !res3.test($(ArrValidate1[i]).val())) {
+                        leaf.alert('请输入合法库存');
+                        return false;
+                    }
+                }
+                for (var k = 0; k < ArrValidate2.length; k++) {
+                    if ($(ArrValidate2[k]).val() == '') {
+                        leaf.alert('请补全单价');
+                        return false;
+                    }
+                    if (!res1.test($(ArrValidate2[k]).val()) && !res2.test($(ArrValidate2[k]).val()) && !res3.test($(ArrValidate2[k]).val())) {
+                        leaf.alert('请输入合法单价');
+                        return false;
+                    }
+                }
+                $('[name="Product[category_id]"]').removeAttr('disabled');
+            });
+        })
+    </script>
+{% endblock %}

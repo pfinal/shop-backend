@@ -1,0 +1,105 @@
+{#{{ app.html.dropDownList('Timelimit[status]', app.request.get('Timelimit').status|default(entity.status), entity.statusAlias(true), {'class':'form-control', 'prompt': '请选择'}) }}#}
+
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">状态</label>
+    <div class="col-sm-8">
+        {% autoescape false %}
+            {{ app.html.radioButtonList('Timelimit[status]', app.request.get('Timelimit').status|default(entity.status) ,  entity.statusAlias(true),{'labelOptions':{'class':'radio-inline js-status-select'}} ) }}
+        {% endautoescape %}
+    </div>
+</div>
+
+
+<div class="js-inputs-div hide">
+    <div class="form-group hide">
+        <label class="col-sm-2 control-label" for="input-product_id">产品</label>
+        <div class="col-sm-8">
+            <input type="text" name="Timelimit[product_id]" class="form-control"
+                   value="{{ app.request.get('Timelimit').product_id|default(entity.product_id) }}"
+                   id="input-product_id">
+            <span class="help-block"> 帮助信息 </span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="input-begin">开始时间</label>
+        <div class="col-sm-8">
+            {#{{ app.html.dropDownList('Timelimit[begin]', app.request.get('Timelimit').begin|default(entity.begin), durationList, {'class':'form-control'}) }}#}
+
+            <input type="text" name="Timelimit[begin]" id="input-begin" autocomplete="off"
+                   value="{{ app.request.get('Timelimit').begin|default(entity.begin) }}"
+                   class="form-control input-sm js-date"
+                   data-date=""
+                   data-date-format="yyyy-mm-dd hh:ii:00"
+            />
+
+            <span class="help-block">{# 帮助信息 #}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="input-duration_second">持续小时</label>
+        <div class="col-sm-8">
+            <input type="text" name="Timelimit[duration_hour]" class="form-control"
+                   value="{{ app.request.get('Timelimit').duration_hour|default(entity.duration_hour) }}"
+                   id="input-duration_second">
+            <span class="help-block">一天<code>24</code>小时，一周<code>168</code>小时，一个月<code>720</code>小时</span>
+        </div>
+    </div>
+
+    {#<div class="form-group">#}
+    {#<label class="col-sm-2 control-label" for="input-status">状态</label>#}
+    {#<div class="col-sm-8">#}
+    {#{{ app.html.dropDownList('Timelimit[status]', app.request.get('Timelimit').status|default(entity.status), entity.statusAlias(true), {'class':'form-control'}) }}#}
+    {#<span class="help-block">#}{# 帮助信息 #}{#</span>#}
+    {#</div>#}
+    {#</div>#}
+
+
+    {% if propertyList|length <= 0 %}
+        {% for item in skuList %}
+            {% set skuId = item.id %}
+            {% set info = item.timelimit %}
+            <div class="form-group js-bulk-div css-bulk-div">
+                <label class="col-sm-2 control-label">抢购价</label>
+                <div class="col-sm-8">
+                    <input type="text" name="Sku[{{ skuId }}][price]" class="form-control"
+                           value="{{ app.request.get('Sku').skuId.price|default(info.price|default('')) }}">
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+
+        <div class="form-group js-bulk-div css-bulk-div">
+            <label class="col-sm-2 control-label">属性</label>
+            <div class="col-sm-8">
+
+                <table class="table">
+                    <tr>
+                        <th><span class="form-control">属性组合</span></th>
+                        <th><span class="form-control price-form-input">单价</span></th>
+                        <th><span class="form-control price-form-input">抢购价</span></th>
+                    </tr>
+                    {% for item in skuList %}
+                        {% set skuId = item.id %}
+                        {% set info = item.timelimit %}
+                        <tr>
+                            <td>{{ item.getSkuInfo.show }} </td>
+                            <td>￥{{ item.price }}</td>
+                            <td>
+                                <input type="text" name="Sku[{{ skuId }}][price]" class="form-control"
+                                       autocomplete="off"
+                                       value="{{ app.request.get('Sku').skuId.price|default(info.price|default('')) }}">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
